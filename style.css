@@ -774,6 +774,23 @@ section { padding: 5rem 2rem; }
 .game-preview.american-dream {
   background: linear-gradient(160deg, #87CEEB 0%, #4a90d9 50%, #1a3b6e 100%);
 }
+.game-preview.tickle-fight {
+  background: linear-gradient(160deg, #0d1b2a 0%, #162032 60%, #1e2d42 100%);
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.tf-stars {
+  display: flex;
+  gap: 10px;
+  color: rgba(245,200,66,0.55);
+  font-size: 0.85rem;
+  letter-spacing: 4px;
+}
+.tf-emoji {
+  font-size: 2.2rem;
+  letter-spacing: 6px;
+  filter: drop-shadow(0 0 10px rgba(245,200,66,0.4));
+}
 .game-preview.simmer-down {
   background: linear-gradient(160deg, #FAFAF7 0%, #EDEBE7 100%);
 }

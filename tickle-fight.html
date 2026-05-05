@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tickle Fight!</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1b2a;
+  --bg2: #162032;
+  --bg3: #1e2d42;
+  --border: rgba(255,255,255,0.1);
+  --text: #e8edf5;
+  --muted: #7a95b8;
+  --gold: #f5c842;
+  --red: #ff4d4d;
+  --green: #4ddb8a;
+  --blue: #4da6ff;
+  --tile-lightning: #2a3a1a;
+  --tile-warrior: #1a2a3a;
+  --tile-shield: #2a1a3a;
+  --tile-starmap: #3a2a1a;
+  --tile-vortex: #1e2a2a;
+  --tile-fireball: #2a1e1a;
+  --tile-comet: #2a2a1e;
+  --tile-vine: #1e2a1e;
+  --tile-pulse: #2a1e2a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+.starfield { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+.star { position: absolute; background: white; border-radius: 50%; animation: twinkle var(--dur,2s) infinite alternate; }
+@keyframes twinkle { from { opacity: 0.12; } to { opacity: 0.75; } }
+.app {
+  position: relative; z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 255px;
+  grid-template-rows: auto 1fr;
+  gap: 12px;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 12px;
+  min-height: 100vh;
+}
+.header { grid-column: 1/-1; text-align: center; padding: 4px 0 6px; }
+.title {
+  font-family: 'Fredoka One', cursive; font-size: 2.5rem; letter-spacing: 3px;
+  background: linear-gradient(135deg, #f5c842 0%, #ff8c42 50%, #ff4d99 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.subtitle { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+.main { display: flex; flex-direction: column; gap: 9px; }
+.grid-wrapper { background: var(--bg2); border-radius: 16px; padding: 12px; border: 1px solid var(--border); }
+.grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+.grid-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); }
+.pairs-badge { font-size: 0.73rem; font-weight: 700; color: var(--gold); background: rgba(245,200,66,0.1); padding: 2px 9px; border-radius: 99px; border: 1px solid rgba(245,200,66,0.22); }
+
+/* Castle strip */
+.castle-strip {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 8px 10px; margin-bottom: 8px;
+  background: linear-gradient(90deg, rgba(245,200,66,0.03), rgba(245,200,66,0.12), rgba(245,200,66,0.03));
+  border-radius: 10px; border: 1px solid rgba(245,200,66,0.2);
+}
+.castle-icon { font-size: 1.9rem; filter: drop-shadow(0 0 6px rgba(245,200,66,0.5)); }
+.castle-label { font-family: 'Fredoka One', cursive; font-size: 0.9rem; color: var(--gold); letter-spacing: 1px; }
+.shield-pips { display: flex; gap: 3px; }
+.shield-pip { width: 15px; height: 15px; background: rgba(181,123,255,0.25); border: 1px solid rgba(181,123,255,0.5); border-radius: 4px; font-size: 9px; display: flex; align-items: center; justify-content: center; }
+
+/* Grid */
+.memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+
+/* Card */
+.card { aspect-ratio: 1; perspective: 500px; cursor: pointer; position: relative; }
+.card-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.38s cubic-bezier(0.4,0,0.2,1); border-radius: 9px; }
+.card.flipped .card-inner, .card.matched .card-inner { transform: rotateY(180deg); }
+.card-back, .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; }
+.card-back { background: linear-gradient(135deg, #1c3050, #243d62); border: 1.5px solid rgba(100,160,255,0.22); }
+.card-back::after { content: '✦'; color: rgba(255,255,255,0.13); font-size: 0.95rem; }
+.card-face { transform: rotateY(180deg); border: 1.5px solid transparent; }
+.card.matched .card-face { opacity: 0.42; border-color: rgba(255,255,255,0.08) !important; }
+.card:not(.matched):not(.flipped):not(.boss-cell):hover .card-back { border-color: rgba(100,200,255,0.45); background: linear-gradient(135deg, #243d62, #2e4e7e); }
+.card.boss-cell { cursor: default; }
+.card.boss-cell .card-back { background: linear-gradient(135deg, #3a1818, #5a2020); border-color: rgba(255,80,80,0.55) !important; box-shadow: 0 0 12px rgba(255,60,60,0.35); }
+.card.peeked .card-face { box-shadow: 0 0 10px rgba(245,200,66,0.55); border-color: var(--gold) !important; }
+.card.warrior-cell .card-back { border-color: rgba(77,166,255,0.55) !important; box-shadow: 0 0 9px rgba(77,166,255,0.28); }
+.card.warrior-cell .card-back::after { content: '⚔'; color: rgba(77,200,255,0.35); font-size: 0.9rem; }
+@keyframes card-shake { 0%,100% { transform: rotateY(0) scale(1); } 30% { transform: rotateY(0) scale(0.87) rotate(-7deg); } 70% { transform: rotateY(0) scale(0.87) rotate(7deg); } }
+.card.scrambling .card-inner { animation: card-shake 0.48s ease-in-out; }
+.boss-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; pointer-events: none; z-index: 2; animation: boss-float 1.9s ease-in-out infinite; }
+@keyframes boss-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+/* Tile face colors */
+.face-lightning { background: var(--tile-lightning); border-color: rgba(139,195,74,0.42) !important; }
+.face-warrior   { background: var(--tile-warrior);   border-color: rgba(77,166,255,0.42) !important; }
+.face-shield    { background: var(--tile-shield);    border-color: rgba(181,123,255,0.42) !important; }
+.face-starmap   { background: var(--tile-starmap);   border-color: rgba(245,200,66,0.42) !important; }
+.face-vortex    { background: var(--tile-vortex);    border-color: rgba(61,214,200,0.35) !important; }
+.face-fireball  { background: var(--tile-fireball);  border-color: rgba(255,140,66,0.35) !important; }
+.face-comet     { background: var(--tile-comet);     border-color: rgba(200,168,86,0.35) !important; }
+.face-vine      { background: var(--tile-vine);      border-color: rgba(86,200,122,0.35) !important; }
+.face-pulse     { background: var(--tile-pulse);     border-color: rgba(200,86,168,0.35) !important; }
+
+/* Status bar */
+.status-bar { display: flex; gap: 7px; align-items: center; padding: 6px 14px; background: var(--bg2); border-radius: 99px; border: 1px solid var(--border); font-size: 0.78rem; font-weight: 700; }
+.sdot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.s-player .sdot { background: var(--green); box-shadow: 0 0 5px var(--green); }
+.s-boss .sdot   { background: var(--red);   box-shadow: 0 0 5px var(--red);   }
+.s-wait .sdot   { background: var(--gold);  box-shadow: 0 0 5px var(--gold);  }
+.s-player { color: var(--green); } .s-boss { color: var(--red); } .s-wait { color: var(--gold); }
+.peek-banner { display: none; padding: 5px 14px; background: rgba(245,200,66,0.09); border: 1px solid rgba(245,200,66,0.28); border-radius: 99px; text-align: center; font-size: 0.75rem; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; }
+.peek-banner.on { display: block; }
+
+/* Sidebar */
+.sidebar { display: flex; flex-direction: column; gap: 9px; }
+.panel { background: var(--bg2); border-radius: 13px; padding: 13px; border: 1px solid var(--border); }
+.ptitle { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 9px; }
+
+/* Boss */
+.boss-face { text-align: center; margin-bottom: 7px; }
+.boss-big { font-size: 2.7rem; display: block; animation: boss-bob 2s ease-in-out infinite; }
+@keyframes boss-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.boss-name { font-family: 'Fredoka One', cursive; color: #ff8888; font-size: 0.95rem; margin-top: 3px; }
+.hp-wrap { background: rgba(255,255,255,0.07); border-radius: 99px; height: 11px; overflow: hidden; border: 1px solid rgba(255,60,60,0.18); margin-bottom: 3px; }
+.hp-bar { height: 100%; background: linear-gradient(90deg, #ff4444, #ff8800); border-radius: 99px; transition: width 0.55s cubic-bezier(0.4,0,0.2,1); }
+.hp-text { font-size: 0.75rem; color: #ff9999; font-weight: 700; text-align: center; }
+@keyframes dmg-flash { 0%,100% { opacity:1; } 50% { opacity:0.15; filter:brightness(5); } }
+.dmg { animation: dmg-flash 0.3s ease-in-out 2; }
+
+/* Dice */
+.dice-area { text-align: center; }
+.dice-big { font-size: 2.3rem; display: inline-block; }
+.dice-big.spin { animation: dspin 0.42s ease-out; }
+@keyframes dspin { 0% { transform: rotate(0) scale(1.4); } 60% { transform: rotate(270deg) scale(0.8); } 100% { transform: rotate(360deg) scale(1); } }
+.dlabel { font-size: 0.72rem; color: var(--muted); margin-top: 3px; font-weight: 700; }
+
+/* Log */
+.logbox { display: flex; flex-direction: column; gap: 3px; min-height: 65px; }
+.logline { font-size: 0.75rem; line-height: 1.35; border-radius: 5px; padding: 3px 7px; }
+.lg { color: var(--green);  background: rgba(77,219,138,0.07); }
+.lb { color: #ff8888;       background: rgba(255,80,80,0.07); }
+.ln { color: var(--gold);   background: rgba(245,200,66,0.07); }
+.li { color: var(--blue);   background: rgba(77,166,255,0.07); }
+
+/* Legend */
+.legend { display: flex; flex-direction: column; gap: 4px; }
+.lrow { display: flex; align-items: center; gap: 7px; padding: 5px 7px; background: rgba(255,255,255,0.025); border-radius: 6px; border: 1px solid rgba(255,255,255,0.055); font-size: 0.72rem; }
+.lswatch { width: 21px; height: 21px; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; flex-shrink: 0; }
+.lname { font-weight: 700; color: var(--text); font-size: 0.71rem; }
+.ldesc { color: var(--muted); font-size: 0.66rem; }
+
+.btn-reset { width: 100%; padding: 9px; font-family: 'Fredoka One', cursive; font-size: 0.95rem; letter-spacing: 1px; border: 1px solid rgba(255,255,255,0.13); border-radius: 99px; background: rgba(255,255,255,0.055); color: var(--text); cursor: pointer; transition: background 0.15s, transform 0.1s; }
+.btn-reset:hover { background: rgba(255,255,255,0.1); transform: translateY(-1px); }
+
+/* Overlay */
+.overlay { position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.82); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+.overlay.off { display: none; }
+.ocard { background: var(--bg2); border: 1px solid rgba(255,255,255,0.14); border-radius: 22px; padding: 40px 48px; text-align: center; max-width: 370px; width: 90%; }
+.oemoji { font-size: 3.8rem; display: block; margin-bottom: 11px; }
+.otitle { font-family: 'Fredoka One', cursive; font-size: 2.3rem; margin-bottom: 9px; }
+.otitle.win { color: var(--gold); } .otitle.lose { color: var(--red); }
+.obody { color: var(--muted); font-size: 0.87rem; line-height: 1.55; margin-bottom: 22px; }
+.btn-play { font-family: 'Fredoka One', cursive; font-size: 1.05rem; letter-spacing: 1px; padding: 11px 34px; background: linear-gradient(135deg, var(--gold), #ff8c42); color: #1a1200; border: none; border-radius: 99px; cursor: pointer; transition: transform 0.12s; }
+.btn-play:hover { transform: translateY(-2px) scale(1.03); }
+
+@media (max-width: 660px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { flex-direction: row; flex-wrap: wrap; }
+  .panel { flex: 1; min-width: 130px; }
+  .title { font-size: 1.75rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="starfield" id="sf"></div>
+
+<div class="overlay off" id="overlay">
+  <div class="ocard">
+    <span class="oemoji" id="oEmoji">🏆</span>
+    <div class="otitle" id="oTitle">Victory!</div>
+    <div class="obody" id="oBody"></div>
+    <button class="btn-play" onclick="initGame()">Play Again</button>
+  </div>
+</div>
+
+<div class="app">
+  <div class="header">
+    <div class="title">🌩 Tickle Fight! 🏰</div>
+    <div class="subtitle">Match tiles to defeat Smashy before he storms the Castle!</div>
+  </div>
+
+  <div class="main">
+    <div class="status-bar s-player" id="sbar">
+      <div class="sdot"></div>
+      <span id="stxt">Your turn — flip a tile!</span>
+    </div>
+    <div class="peek-banner" id="peekBanner">⭐ Star Map active — click 3 tiles to peek!</div>
+    <div class="grid-wrapper">
+      <div class="grid-header">
+        <div class="grid-label">Battle Arena</div>
+        <div class="pairs-badge" id="pBadge">0 / 18 matched</div>
+      </div>
+      <div class="castle-strip">
+        <span class="castle-icon">🏰</span>
+        <span class="castle-label">CLOUD CASTLE</span>
+        <div class="shield-pips" id="shieldPips"></div>
+      </div>
+      <div class="memory-grid" id="grid"></div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <div class="panel">
+      <div class="ptitle">The Boss</div>
+      <div class="boss-face">
+        <span class="boss-big" id="bEmoji">🧌</span>
+        <div class="boss-name">Smashy</div>
+      </div>
+      <div class="hp-wrap"><div class="hp-bar" id="hpBar" style="width:100%"></div></div>
+      <div class="hp-text" id="hpTxt">12 / 12 HP</div>
+    </div>
+
+    <div class="panel">
+      <div class="ptitle">Boss Dice</div>
+      <div class="dice-area">
+        <div class="dice-big" id="dBig">🎲</div>
+        <div class="dlabel" id="dLabel">Waiting...</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="ptitle">Battle Log</div>
+      <div class="logbox" id="logbox"></div>
+    </div>
+
+    <div class="panel">
+      <div class="ptitle">Tile Powers</div>
+      <div class="legend">
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-lightning);border:1px solid rgba(139,195,74,0.5)">⚡</div><div><div class="lname">Lightning</div><div class="ldesc">2 damage to boss</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-warrior);border:1px solid rgba(77,166,255,0.5)">⚔️</div><div><div class="lname">Cloud Warrior</div><div class="ldesc">Guard a tile, 3 dmg on contact</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-shield);border:1px solid rgba(181,123,255,0.5)">🛡️</div><div><div class="lname">Wind Shield</div><div class="ldesc">Blocks one castle breach</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-starmap);border:1px solid rgba(245,200,66,0.5)">⭐</div><div><div class="lname">Star Map</div><div class="ldesc">Peek at 3 face-down tiles</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-fireball);border:1px solid rgba(255,140,66,0.4)">🔥</div><div><div class="lname">Fireball</div><div class="ldesc">1 dmg + boss skips next turn</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-comet);border:1px solid rgba(200,168,86,0.4)">💫</div><div><div class="lname">Comet</div><div class="ldesc">Push boss 1 row back</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-comet);border:1px solid rgba(200,168,86,0.4)">💫</div><div><div class="lname">Comet (×2)</div><div class="ldesc">Push boss 1 row back</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-pulse);border:1px solid rgba(200,86,168,0.4)">💜</div><div><div class="lname">Magic Pulse</div><div class="ldesc">3 damage to boss</div></div></div>
+      </div>
+    </div>
+
+    <button class="btn-reset" onclick="initGame()">🔄 New Game</button>
+  </div>
+</div>
+
+<script>
+const COLS = 4, ROWS = 6, TOTAL = 24, BOSS_MAX = 12;
+// Row 0 = top (castle side), Row 5 = bottom (boss starts here)
+// Boss wins by reaching row -1 (tries to move above row 0)
+
+const TILES = [
+  { id:'lightning', emoji:'⚡', fc:'face-lightning' },
+  { id:'warrior',   emoji:'⚔️',  fc:'face-warrior'   },
+  { id:'shield',    emoji:'🛡️',  fc:'face-shield'    },
+  { id:'starmap',   emoji:'⭐', fc:'face-starmap'   },
+  { id:'fireball',  emoji:'🔥', fc:'face-fireball'  },
+  { id:'comet',     emoji:'💫', fc:'face-comet'     },
+  { id:'comet2',    emoji:'💫', fc:'face-comet'     },
+  { id:'pulse',     emoji:'💜', fc:'face-pulse'     },
+];
+
+const DICE_DEF = [
+  { e:'⬅️', lbl:'Slides left!',                    dr:0,  dc:-1 },
+  { e:'➡️', lbl:'Slides right!',                   dr:0,  dc:1  },
+  { e:'⬆️', lbl:'Straight ahead!',                 dr:-1, dc:0  },
+  { e:'⬆️', lbl:'Straight ahead again!',           dr:-1, dc:0  },
+  { e:'↔️', lbl:'SWAP — left & right tiles mix!',  swapLR:true  },
+  { e:'↕️', lbl:'SWAP — front & back tiles mix!',  swapFB:true  },
+];
+
+let G = {};
+
+function initGame() {
+  let deck = [];
+  // 24 cards: lightning/warrior/shield/starmap get 4 copies (2 pairs each),
+  // fireball/comet/vine/pulse get 2 copies (1 pair each) → 4×4 + 4×2 = 24
+  const counts = { lightning:4, warrior:4, shield:4, starmap:4, fireball:2, comet:2, comet2:2, pulse:2 };
+  TILES.forEach(t => { for(let i=0;i<counts[t.id];i++) deck.push({...t}); });
+  shuffle(deck);
+  G = {
+    cards: deck,
+    flipped: [],
+    matched: new Set(),
+    bossR: 5, bossC: 1,
+    warriors: {},
+    shields: 0,
+    hp: BOSS_MAX,
+    peek: false, peekN: 0, peekIdx: [],
+    canFlip: true,
+    phase: 'player',
+    stunned: false,
+    pairs: 0,
+    log: [],
+  };
+  hideOv();
+  render();
+  addLog('Smashy appears! Match tiles to defeat him!', 'n');
+}
+
+function idxOf(r,c){ return r*COLS+c; }
+function rcOf(i){ return {r:Math.floor(i/COLS), c:i%COLS}; }
+
+function render(){
+  renderGrid(); renderBoss(); renderStatus(); renderLog(); renderPeek(); renderShields();
+}
+
+function renderGrid(){
+  const g = document.getElementById('grid');
+  g.innerHTML = '';
+  for(let i=0;i<TOTAL;i++){
+    const {r,c}=rcOf(i);
+    const card=G.cards[i];
+    const isBoss=(r===G.bossR && c===G.bossC);
+    const isMatched=G.matched.has(i);
+    const isFlipped=G.flipped.includes(i);
+    const isWarrior=!!G.warriors[`${r},${c}`];
+    const el=document.createElement('div');
+    el.className='card';
+    if(isFlipped||isMatched) el.classList.add('flipped');
+    if(isMatched) el.classList.add('matched');
+    if(isBoss) el.classList.add('boss-cell');
+    if(isWarrior && !isBoss) el.classList.add('warrior-cell');
+    el.innerHTML=`<div class="card-inner"><div class="card-back"></div><div class="card-face ${card.fc}">${card.emoji}</div></div>${isBoss?'<div class="boss-overlay">🧌</div>':''}`;
+    if(!isMatched && !isBoss) el.addEventListener('click',()=>onCard(i));
+    g.appendChild(el);
+  }
+  document.getElementById('pBadge').textContent=`${G.pairs} / 12 matched`;
+}
+
+function renderBoss(){
+  const pct=Math.max(0,G.hp/BOSS_MAX*100);
+  document.getElementById('hpBar').style.width=pct+'%';
+  document.getElementById('hpTxt').textContent=`${Math.max(0,G.hp)} / ${BOSS_MAX} HP`;
+  const e=G.hp<=0?'💥':G.hp<=4?'😵':G.hp<=8?'🧌':'🧌';
+  document.getElementById('bEmoji').textContent=e;
+}
+
+function renderShields(){
+  const el=document.getElementById('shieldPips');
+  el.innerHTML=Array(G.shields).fill('<div class="shield-pip">🛡</div>').join('');
+}
+
+function renderStatus(){
+  const bar=document.getElementById('sbar'), txt=document.getElementById('stxt');
+  if(G.peek){ bar.className='status-bar s-wait'; txt.textContent=`⭐ Peek — ${3-G.peekN} left`; }
+  else if(G.phase==='player'){ bar.className='status-bar s-player'; txt.textContent=G.flipped.length===0?'Your turn — flip a tile!':'Flip one more tile!'; }
+  else if(G.phase==='boss'){ bar.className='status-bar s-boss'; txt.textContent="Smashy's turn!"; }
+  else{ bar.className='status-bar s-wait'; txt.textContent='Game over'; }
+}
+
+function renderLog(){
+  const el=document.getElementById('logbox');
+  const cls={g:'lg',b:'lb',n:'ln',i:'li'};
+  el.innerHTML=G.log.slice(-5).map(l=>`<div class="logline ${cls[l.t]}">${l.m}</div>`).join('');
+}
+
+function renderPeek(){
+  document.getElementById('peekBanner').className='peek-banner'+(G.peek?' on':'');
+}
+
+function setDice(ri){
+  const d=document.getElementById('dBig'), l=document.getElementById('dLabel');
+  d.textContent=DICE_DEF[ri].e; d.className='dice-big spin';
+  setTimeout(()=>d.className='dice-big',460);
+  l.textContent=DICE_DEF[ri].lbl;
+}
+
+function onCard(i){
+  if(G.phase==='over') return;
+  if(G.peek){
+    if(G.matched.has(i)||G.flipped.includes(i)||G.peekIdx.includes(i)) return;
+    G.peekIdx.push(i); G.peekN++;
+    const e=cardEl(i); e.classList.add('flipped','peeked');
+    renderStatus();
+    if(G.peekN>=3){
+      setTimeout(()=>{
+        G.peekIdx.forEach(pi=>{ const x=cardEl(pi); if(x){x.classList.remove('flipped','peeked');} });
+        G.peek=false; G.peekN=0; G.peekIdx=[];
+        addLog('⭐ Peek ended — remember those tiles!','i');
+        renderStatus(); renderPeek();
+      },2200);
+    }
+    return;
+  }
+  if(G.phase!=='player'||!G.canFlip) return;
+  if(G.matched.has(i)||G.flipped.includes(i)||G.flipped.length>=2) return;
+  G.flipped.push(i);
+  cardEl(i).classList.add('flipped');
+  renderStatus();
+  if(G.flipped.length===2){
+    G.canFlip=false;
+    const [a,b]=G.flipped;
+    if(G.cards[a].id===G.cards[b].id){
+      setTimeout(()=>{
+        G.matched.add(a); G.matched.add(b); G.pairs++;
+        const id=G.cards[a].id; G.flipped=[]; G.canFlip=true;
+        applyPower(id); render();
+        if(checkWin()) return;
+        setTimeout(()=>bossTurn(),480);
+      },400);
+    } else {
+      setTimeout(()=>{
+        cardEl(a).classList.remove('flipped'); cardEl(b).classList.remove('flipped');
+        G.flipped=[]; G.canFlip=true; renderStatus();
+        bossTurn();
+      },820);
+    }
+  }
+}
+
+function applyPower(id){
+  if(id==='lightning')   damageBoss(2,'⚡ Lightning Strike — 2 damage!');
+  else if(id==='warrior') placeWarrior();
+  else if(id==='shield')  { G.shields++; addLog(`🛡️ Wind Shield raised! ${G.shields} shield${G.shields>1?'s':''}!`,'g'); renderShields(); }
+  else if(id==='starmap') { G.peek=true; G.peekN=0; G.peekIdx=[]; addLog('⭐ Star Map! Click 3 tiles to peek...','i'); }
+  else if(id==='fireball'){ damageBoss(1,'🔥 Fireball — 1 damage!'); G.stunned=true; addLog('🔥 Boss stunned — skips next turn!','g'); }
+  else if(id==='comet'||id==='comet2') pushBack();
+  else if(id==='pulse')   damageBoss(3,'💜 Magic Pulse — 3 damage!');
+}
+
+function placeWarrior(){
+  for(let r=G.bossR-1;r>=0;r--){
+    for(let dc=0;dc<=3;dc++){
+      for(const s of [dc,-dc]){
+        const c=G.bossC+s;
+        if(c<0||c>=COLS) continue;
+        const k=`${r},${c}`;
+        if(!G.warriors[k]){ G.warriors[k]=true; addLog(`⚔️ Cloud Warrior placed at row ${r}!`,'g'); return; }
+      }
+    }
+  }
+  const k=`0,${G.bossC}`; G.warriors[k]=true;
+  addLog('⚔️ Cloud Warrior guards the castle gates!','g');
+}
+
+function pushBack(){
+  if(G.bossR<ROWS-1){ G.bossR++; addLog('💫 Comet! Boss pushed back a row!','g'); }
+  else addLog('💫 Comet! Boss is already at the edge.','n');
+  render();
+}
+
+function revealAll(){
+  addLog('🌿 Vine Snare — all tiles revealed for 2 seconds!','i');
+  document.querySelectorAll('#grid .card:not(.matched)').forEach(c=>c.classList.add('flipped'));
+  setTimeout(()=>{ renderGrid(); },2000);
+}
+
+function damageBoss(amt,msg){
+  G.hp=Math.max(0,G.hp-amt);
+  addLog(msg,'g');
+  const e=document.getElementById('bEmoji');
+  e.classList.add('dmg'); setTimeout(()=>e.classList.remove('dmg'),700);
+  renderBoss();
+}
+
+function bossTurn(){
+  if(G.phase==='over') return;
+  if(G.peek){ const t=setInterval(()=>{ if(!G.peek){clearInterval(t);doBoss();} },200); return; }
+  doBoss();
+}
+
+function doBoss(){
+  if(G.stunned){ G.stunned=false; addLog('🔥 Boss stunned — skips turn!','n'); G.phase='player'; G.canFlip=true; renderStatus(); return; }
+  G.phase='boss'; renderStatus();
+  setTimeout(()=>{
+    let ri=Math.floor(Math.random()*6);
+    setDice(ri);
+    setTimeout(()=>{ execMove(ri); if(G.phase!=='over'){G.phase='player';G.canFlip=true;renderStatus();} },580);
+  },340);
+}
+
+function execMove(ri){
+  const d=DICE_DEF[ri];
+
+  if(d.swapLR){
+    const left  = findFaceDown(G.bossR, G.bossC, 0, -1);
+    const right = findFaceDown(G.bossR, G.bossC, 0,  1);
+    if(left!==null && right!==null){ swapIndices(left, right); addLog('↔️ Boss swaps nearest face-down tiles left & right!','b'); }
+    else addLog('↔️ Boss tried to swap left & right — no face-down tiles found!','n');
+    render(); return;
+  }
+  if(d.swapFB){
+    const front = findFaceDown(G.bossR, G.bossC, -1, 0);
+    const back  = findFaceDown(G.bossR, G.bossC,  1, 0);
+    if(front!==null && back!==null){ swapIndices(front, back); addLog('↕️ Boss swaps nearest face-down tiles front & back!','b'); }
+    else addLog('↕️ Boss tried to swap front & back — no face-down tiles found!','n');
+    render(); return;
+  }
+
+  let nr=G.bossR+d.dr, nc=G.bossC+d.dc;
+  nc=Math.max(0,Math.min(COLS-1,nc));
+  if(nr>=ROWS) nr=ROWS-1;
+
+  G.bossR=nr; G.bossC=nc;
+  const dirs=['slides left','slides right','charges ahead','charges ahead'];
+  addLog(`🧌 Boss ${dirs[ri]}! Row ${G.bossR}.`,'b');
+
+  // Check warrior
+  const wk=`${G.bossR},${G.bossC}`;
+  if(G.warriors[wk]){ delete G.warriors[wk]; damageBoss(3,'⚔️ Warrior intercepts — 3 damage!'); if(checkWin()) return; }
+
+  // Reached castle (row <= 0)
+  if(G.bossR<=0){
+    if(G.shields>0){
+      G.shields--; G.bossR=1;
+      addLog(`🛡️ Shield absorbs breach! ${G.shields} left.`,'g');
+      renderShields();
+    } else {
+      addLog('💀 Smashy storms the castle! GAME OVER!','b');
+      G.phase='over'; render();
+      setTimeout(()=>showOv(false),650); return;
+    }
+  }
+  render();
+}
+
+// Scan outward from boss in direction (dr,dc), skipping face-up/matched/boss tiles,
+// returning the index of the first face-down tile found (or null if none).
+function findFaceDown(fromR, fromC, dr, dc){
+  let r=fromR+dr, c=fromC+dc;
+  while(r>=0 && r<ROWS && c>=0 && c<COLS){
+    const i=idxOf(r,c);
+    const isBoss=(r===G.bossR && c===G.bossC);
+    if(!isBoss && !G.matched.has(i) && !G.flipped.includes(i)) return i;
+    r+=dr; c+=dc;
+  }
+  return null;
+}
+
+function swapIndices(i1, i2){
+  [i1,i2].forEach(i=>{ const e=cardEl(i); if(e) e.classList.add('scrambling'); });
+  setTimeout(()=>{
+    const tmp={id:G.cards[i1].id, emoji:G.cards[i1].emoji, fc:G.cards[i1].fc};
+    G.cards[i1].id=G.cards[i2].id; G.cards[i1].emoji=G.cards[i2].emoji; G.cards[i1].fc=G.cards[i2].fc;
+    G.cards[i2].id=tmp.id; G.cards[i2].emoji=tmp.emoji; G.cards[i2].fc=tmp.fc;
+    G.flipped=G.flipped.filter(f=>f!==i1&&f!==i2);
+    [i1,i2].forEach(i=>{ const e=cardEl(i); if(e) e.classList.remove('scrambling'); });
+    renderGrid();
+  },490);
+}
+
+
+
+function checkWin(){
+  if(G.hp<=0){ G.phase='over'; render(); setTimeout(()=>showOv(true),380); return true; }
+  return false;
+}
+
+function showOv(win){
+  document.getElementById('overlay').classList.remove('off');
+  document.getElementById('oEmoji').textContent=win?'🏆':'💀';
+  document.getElementById('oTitle').textContent=win?'Victory!':'Defeated!';
+  document.getElementById('oTitle').className='otitle '+(win?'win':'lose');
+  document.getElementById('oBody').textContent=win
+    ?'Smashy is defeated! The Cloud Castle stands! 🎉'
+    :'Smashy stormed the gates! The castle has fallen... 😰';
+}
+function hideOv(){ document.getElementById('overlay').classList.add('off'); }
+
+function addLog(m,t='n'){ G.log.push({m,t}); if(G.log.length>30) G.log.shift(); renderLog(); }
+function cardEl(i){ return document.getElementById('grid').children[i]; }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} }
+
+// Stars
+(function(){
+  const sf=document.getElementById('sf');
+  for(let i=0;i<72;i++){
+    const s=document.createElement('div'); s.className='star';
+    const sz=Math.random()*2.4+0.7;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*65}%;--dur:${1.3+Math.random()*2.4}s;animation-delay:${Math.random()*3}s`;
+    sf.appendChild(s);
+  }
+})();
+
+initGame();
+</script>
+</body>
+</html>
