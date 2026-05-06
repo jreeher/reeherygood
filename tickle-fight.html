@@ -69,13 +69,13 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
 .shield-pip { width: 15px; height: 15px; background: rgba(181,123,255,0.25); border: 1px solid rgba(181,123,255,0.5); border-radius: 4px; font-size: 9px; display: flex; align-items: center; justify-content: center; }
 
 /* Grid */
-.memory-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.memory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; max-width: 260px; margin: 0 auto; }
 
 /* Card */
 .card { aspect-ratio: 1; perspective: 500px; cursor: pointer; position: relative; }
 .card-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.38s cubic-bezier(0.4,0,0.2,1); border-radius: 9px; }
 .card.flipped .card-inner, .card.matched .card-inner { transform: rotateY(180deg); }
-.card-back, .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.45rem; }
+.card-back, .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
 .card-back { background: linear-gradient(135deg, #1c3050, #243d62); border: 1.5px solid rgba(100,160,255,0.22); }
 .card-back::after { content: '✦'; color: rgba(255,255,255,0.13); font-size: 0.95rem; }
 .card-face { transform: rotateY(180deg); border: 1.5px solid transparent; }
@@ -86,9 +86,27 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
 .card.peeked .card-face { box-shadow: 0 0 10px rgba(245,200,66,0.55); border-color: var(--gold) !important; }
 .card.warrior-cell .card-back { border-color: rgba(77,166,255,0.55) !important; box-shadow: 0 0 9px rgba(77,166,255,0.28); }
 .card.warrior-cell .card-back::after { content: '⚔'; color: rgba(77,200,255,0.35); font-size: 0.9rem; }
-@keyframes card-shake { 0%,100% { transform: rotateY(0) scale(1); } 30% { transform: rotateY(0) scale(0.87) rotate(-7deg); } 70% { transform: rotateY(0) scale(0.87) rotate(7deg); } }
-.card.scrambling .card-inner { animation: card-shake 0.48s ease-in-out; }
-.boss-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; pointer-events: none; z-index: 2; animation: boss-float 1.9s ease-in-out infinite; }
+/* Warrior overlay on card */
+.warrior-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; pointer-events: none; z-index: 2;
+  animation: warrior-pulse 2s ease-in-out infinite;
+}
+@keyframes warrior-pulse {
+  0%,100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(77,166,255,0.6)); }
+  50%      { transform: scale(1.15); filter: drop-shadow(0 0 10px rgba(77,166,255,1)); }
+}
+.card.rock-cell { cursor: not-allowed; }
+.card.rock-cell .card-back { background: linear-gradient(135deg, #2a2018, #3a3020) !important; border-color: rgba(180,140,60,0.5) !important; box-shadow: 0 0 8px rgba(150,110,40,0.3); }
+.rock-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; pointer-events: none; z-index: 2; }
+  border-color: rgba(77,166,255,0.7) !important;
+  box-shadow: 0 0 12px rgba(77,166,255,0.4) !important;
+  cursor: crosshair;
+}
+@keyframes card-shake { 0%,100% { transform: rotateY(0) scale(1); } 20% { transform: rotateY(0) scale(0.82) rotate(-10deg); } 40% { transform: rotateY(0) scale(0.82) rotate(10deg); } 60% { transform: rotateY(0) scale(0.82) rotate(-6deg); } 80% { transform: rotateY(0) scale(0.82) rotate(6deg); } }
+.card.scrambling .card-inner { animation: card-shake 0.5s ease-in-out; }
+.boss-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; pointer-events: none; z-index: 2; animation: boss-float 1.9s ease-in-out infinite; }
 @keyframes boss-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
 
 /* Tile face colors */
@@ -118,7 +136,8 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
 .ptitle { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 9px; }
 
 /* Boss */
-.boss-face { text-align: center; margin-bottom: 7px; }
+.boss-face { text-align: center; margin-bottom: 7px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+.dice-inline { display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .boss-big { font-size: 2.7rem; display: block; animation: boss-bob 2s ease-in-out infinite; }
 @keyframes boss-bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 .boss-name { font-family: 'Fredoka One', cursive; color: #ff8888; font-size: 0.95rem; margin-top: 3px; }
@@ -164,7 +183,75 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
 .btn-play { font-family: 'Fredoka One', cursive; font-size: 1.05rem; letter-spacing: 1px; padding: 11px 34px; background: linear-gradient(135deg, var(--gold), #ff8c42); color: #1a1200; border: none; border-radius: 99px; cursor: pointer; transition: transform 0.12s; }
 .btn-play:hover { transform: translateY(-2px) scale(1.03); }
 
-@media (max-width: 660px) {
+/* Power popup */
+.power-popup {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+  z-index: 300; pointer-events: none;
+  background: rgba(10,20,40,0.92); border-radius: 20px;
+  padding: 18px 36px; text-align: center;
+  border: 2px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  transition: none;
+}
+.power-popup.show {
+  animation: popup-in 0.25s cubic-bezier(0.34,1.56,0.64,1) forwards,
+             popup-out 0.3s ease-in 1.4s forwards;
+}
+@keyframes popup-in  { to   { transform: translate(-50%,-50%) scale(1); opacity:1; } }
+@keyframes popup-out { from { opacity:1; } to { opacity:0; transform: translate(-50%,-60%) scale(0.85); } }
+.popup-emoji { font-size: 2.4rem; display: block; margin-bottom: 4px; }
+.popup-title { font-family: 'Fredoka One', cursive; font-size: 1.6rem; color: white; }
+.popup-sub   { font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 2px; }
+
+/* Screen shake */
+@keyframes shake {
+  0%,100% { transform: translate(0,0) rotate(0); }
+  15%  { transform: translate(-6px,3px) rotate(-1deg); }
+  30%  { transform: translate(5px,-4px) rotate(1deg); }
+  45%  { transform: translate(-4px,5px) rotate(-0.5deg); }
+  60%  { transform: translate(4px,-3px) rotate(0.5deg); }
+  75%  { transform: translate(-3px,2px) rotate(-0.3deg); }
+}
+body.shake { animation: shake 0.45s ease-in-out; }
+
+/* Match burst - applied manually to just-matched cards */
+@keyframes match-burst {
+  0%   { transform: rotateY(180deg) scale(1); }
+  40%  { transform: rotateY(180deg) scale(1.18); box-shadow: 0 0 28px 8px rgba(255,220,50,0.7); }
+  100% { transform: rotateY(180deg) scale(1); }
+}
+.card.just-matched .card-inner { animation: match-burst 0.55s ease-out forwards; }
+
+/* Milestone banner */
+.milestone {
+  position: fixed; top: 80px; left: 50%; transform: translateX(-50%) translateY(-120px);
+  z-index: 250; pointer-events: none;
+  background: linear-gradient(135deg, #f5c842, #ff8c42);
+  color: #1a1000; font-family: 'Fredoka One', cursive;
+  font-size: 1.1rem; letter-spacing: 1px;
+  padding: 10px 28px; border-radius: 99px;
+  box-shadow: 0 4px 24px rgba(245,200,66,0.5);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
+  opacity: 0;
+}
+.milestone.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.milestone.hide { transform: translateX(-50%) translateY(-120px); opacity: 0; transition: transform 0.3s ease-in, opacity 0.3s; }
+
+/* Smashy crack states */
+.boss-big.cracked { filter: drop-shadow(0 0 8px rgba(255,100,50,0.7)) sepia(0.4); }
+.boss-big.critical { filter: drop-shadow(0 0 14px rgba(255,50,50,0.9)) sepia(0.7); animation: boss-bob 0.7s ease-in-out infinite; }
+
+/* Taunt bubble */
+.taunt-bubble {
+  margin-top: 6px; padding: 5px 10px;
+  background: rgba(255,80,80,0.1); border: 1px solid rgba(255,80,80,0.25);
+  border-radius: 8px; font-size: 0.72rem; color: #ffaaaa;
+  text-align: center; font-style: italic;
+  min-height: 28px;
+  transition: opacity 0.3s;
+}
+
   .app { grid-template-columns: 1fr; }
   .sidebar { flex-direction: row; flex-wrap: wrap; }
   .panel { flex: 1; min-width: 130px; }
@@ -175,6 +262,14 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
 <body>
 
 <div class="starfield" id="sf"></div>
+
+<div class="power-popup" id="powerPopup">
+  <span class="popup-emoji" id="ppEmoji"></span>
+  <div class="popup-title" id="ppTitle"></div>
+  <div class="popup-sub"   id="ppSub"></div>
+</div>
+<div class="milestone" id="milestone"></div>
+
 
 <div class="overlay off" id="overlay">
   <div class="ocard">
@@ -196,11 +291,11 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
       <div class="sdot"></div>
       <span id="stxt">Your turn — flip a tile!</span>
     </div>
-    <div class="peek-banner" id="peekBanner">⭐ Star Map active — click 3 tiles to peek!</div>
+    <div class="peek-banner" id="peekBanner">⭐ Star Map active — click 4 tiles to peek!</div>
     <div class="grid-wrapper">
       <div class="grid-header">
         <div class="grid-label">Battle Arena</div>
-        <div class="pairs-badge" id="pBadge">0 / 18 matched</div>
+        <div class="pairs-badge" id="pBadge">0 / 9 matched</div>
       </div>
       <div class="castle-strip">
         <span class="castle-icon">🏰</span>
@@ -216,36 +311,26 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
       <div class="ptitle">The Boss</div>
       <div class="boss-face">
         <span class="boss-big" id="bEmoji">🧌</span>
+        <div class="dice-inline">
+          <div class="dice-big" id="dBig">🎲</div>
+          <div class="dlabel" id="dLabel">Waiting...</div>
+        </div>
         <div class="boss-name">Smashy</div>
       </div>
       <div class="hp-wrap"><div class="hp-bar" id="hpBar" style="width:100%"></div></div>
-      <div class="hp-text" id="hpTxt">12 / 12 HP</div>
-    </div>
-
-    <div class="panel">
-      <div class="ptitle">Boss Dice</div>
-      <div class="dice-area">
-        <div class="dice-big" id="dBig">🎲</div>
-        <div class="dlabel" id="dLabel">Waiting...</div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="ptitle">Battle Log</div>
-      <div class="logbox" id="logbox"></div>
+      <div class="hp-text" id="hpTxt">8 / 8 HP</div>
+      <div class="taunt-bubble" id="tauntBubble">😤 I will squash your castle!</div>
     </div>
 
     <div class="panel">
       <div class="ptitle">Tile Powers</div>
       <div class="legend">
-        <div class="lrow"><div class="lswatch" style="background:var(--tile-lightning);border:1px solid rgba(139,195,74,0.5)">⚡</div><div><div class="lname">Lightning</div><div class="ldesc">2 damage to boss</div></div></div>
-        <div class="lrow"><div class="lswatch" style="background:var(--tile-warrior);border:1px solid rgba(77,166,255,0.5)">⚔️</div><div><div class="lname">Cloud Warrior</div><div class="ldesc">Guard a tile, 3 dmg on contact</div></div></div>
-        <div class="lrow"><div class="lswatch" style="background:var(--tile-shield);border:1px solid rgba(181,123,255,0.5)">🛡️</div><div><div class="lname">Wind Shield</div><div class="ldesc">Blocks one castle breach</div></div></div>
-        <div class="lrow"><div class="lswatch" style="background:var(--tile-starmap);border:1px solid rgba(245,200,66,0.5)">⭐</div><div><div class="lname">Star Map</div><div class="ldesc">Peek at 3 face-down tiles</div></div></div>
-        <div class="lrow"><div class="lswatch" style="background:var(--tile-fireball);border:1px solid rgba(255,140,66,0.4)">🔥</div><div><div class="lname">Fireball</div><div class="ldesc">1 dmg + boss skips next turn</div></div></div>
-        <div class="lrow"><div class="lswatch" style="background:var(--tile-comet);border:1px solid rgba(200,168,86,0.4)">💫</div><div><div class="lname">Comet</div><div class="ldesc">Push boss 1 row back</div></div></div>
-        <div class="lrow"><div class="lswatch" style="background:var(--tile-comet);border:1px solid rgba(200,168,86,0.4)">💫</div><div><div class="lname">Comet (×2)</div><div class="ldesc">Push boss 1 row back</div></div></div>
-        <div class="lrow"><div class="lswatch" style="background:var(--tile-pulse);border:1px solid rgba(200,86,168,0.4)">💜</div><div><div class="lname">Magic Pulse</div><div class="ldesc">3 damage to boss</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-lightning);border:1px solid rgba(139,195,74,0.5)">⚡</div><div><div class="lname">Lightning <span style="color:var(--gold)">×2</span></div><div class="ldesc">2 damage to boss</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-warrior);border:1px solid rgba(77,166,255,0.5)">⚔️</div><div><div class="lname">Cloud Warrior <span style="color:var(--gold)">×2</span></div><div class="ldesc">Stops Smashy on matched tile</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-shield);border:1px solid rgba(181,123,255,0.5)">🛡️</div><div><div class="lname">Wind Shield <span style="color:var(--gold)">×1</span></div><div class="ldesc">Blocks one castle breach</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-starmap);border:1px solid rgba(245,200,66,0.5)">⭐</div><div><div class="lname">Star Map <span style="color:var(--gold)">×1</span></div><div class="ldesc">Peek at 4 face-down tiles</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-fireball);border:1px solid rgba(255,140,66,0.4)">🌈</div><div><div class="lname">Rainbow Blast <span style="color:var(--gold)">×2</span></div><div class="ldesc">3 damage to Smashy</div></div></div>
+        <div class="lrow"><div class="lswatch" style="background:var(--tile-comet);border:1px solid rgba(200,168,86,0.4)">💫</div><div><div class="lname">Comet <span style="color:var(--gold)">×1</span></div><div class="ldesc">1 dmg + push Smashy back</div></div></div>
       </div>
     </div>
 
@@ -254,7 +339,7 @@ body { font-family: 'Nunito', sans-serif; background: var(--bg); color: var(--te
 </div>
 
 <script>
-const COLS = 4, ROWS = 6, TOTAL = 24, BOSS_MAX = 12;
+const COLS = 3, ROWS = 6, TOTAL = 18, BOSS_MAX = 8;
 // Row 0 = top (castle side), Row 5 = bottom (boss starts here)
 // Boss wins by reaching row -1 (tries to move above row 0)
 
@@ -263,47 +348,51 @@ const TILES = [
   { id:'warrior',   emoji:'⚔️',  fc:'face-warrior'   },
   { id:'shield',    emoji:'🛡️',  fc:'face-shield'    },
   { id:'starmap',   emoji:'⭐', fc:'face-starmap'   },
-  { id:'fireball',  emoji:'🔥', fc:'face-fireball'  },
+  { id:'fireball',  emoji:'🌈', fc:'face-fireball'  },
   { id:'comet',     emoji:'💫', fc:'face-comet'     },
-  { id:'comet2',    emoji:'💫', fc:'face-comet'     },
-  { id:'pulse',     emoji:'💜', fc:'face-pulse'     },
+  { id:'comet',     emoji:'💫', fc:'face-comet'     },
 ];
 
 const DICE_DEF = [
-  { e:'⬅️', lbl:'Slides left!',                    dr:0,  dc:-1 },
-  { e:'➡️', lbl:'Slides right!',                   dr:0,  dc:1  },
-  { e:'⬆️', lbl:'Straight ahead!',                 dr:-1, dc:0  },
-  { e:'⬆️', lbl:'Straight ahead again!',           dr:-1, dc:0  },
-  { e:'↔️', lbl:'SWAP — left & right tiles mix!',  swapLR:true  },
-  { e:'↕️', lbl:'SWAP — front & back tiles mix!',  swapFB:true  },
+  { e:'⬆️',    lbl:'Charge ahead!',                step:true    },
+  { e:'⬆️⬆️',  lbl:'Double step — moves twice!',  step2:true   },
+  { e:'⬆️⬆️⬆️',lbl:'Triple step — moves three!',  step3:true   },
+  { e:'🪨',    lbl:'ROCK! Current tile is blocked!', rock:true  },
+  { e:'↔️',    lbl:'SWAP — tiles next to Smashy!', swapAdj:true },
+  { e:'↔️',    lbl:'SWAP — tiles next to Smashy!', swapAdj:true },
 ];
 
 let G = {};
 
 function initGame() {
   let deck = [];
-  // 24 cards: lightning/warrior/shield/starmap get 4 copies (2 pairs each),
-  // fireball/comet/vine/pulse get 2 copies (1 pair each) → 4×4 + 4×2 = 24
-  const counts = { lightning:4, warrior:4, shield:4, starmap:4, fireball:2, comet:2, comet2:2, pulse:2 };
+  // 18 cards: lightning×4, warrior×4, fireball×4 (2 pairs each),
+  // shield×2, starmap×2, comet×2 (1 pair each) → 3×4 + 3×2 = 18
+  const counts = { lightning:4, warrior:4, shield:2, starmap:2, fireball:4, comet:2 };
   TILES.forEach(t => { for(let i=0;i<counts[t.id];i++) deck.push({...t}); });
   shuffle(deck);
   G = {
     cards: deck,
     flipped: [],
     matched: new Set(),
-    bossR: 5, bossC: 1,
+    bossR: 5, bossC: 0,
     warriors: {},
+    rocks: [],
     shields: 0,
     hp: BOSS_MAX,
     peek: false, peekN: 0, peekIdx: [],
     canFlip: true,
     phase: 'player',
     stunned: false,
+    warriorMode: false,  // waiting for player to click a tile to place warrior
     pairs: 0,
+    lastMatched: [],
+    powerDelay: 480,
     log: [],
   };
   hideOv();
   render();
+  smashyTaunt('start');
   addLog('Smashy appears! Match tiles to defeat him!', 'n');
 }
 
@@ -324,25 +413,32 @@ function renderGrid(){
     const isMatched=G.matched.has(i);
     const isFlipped=G.flipped.includes(i);
     const isWarrior=!!G.warriors[`${r},${c}`];
+    const isRock=G.rocks.includes(i);
     const el=document.createElement('div');
     el.className='card';
     if(isFlipped||isMatched) el.classList.add('flipped');
     if(isMatched) el.classList.add('matched');
+    if(G.lastMatched.includes(i)) el.classList.add('just-matched');
     if(isBoss) el.classList.add('boss-cell');
     if(isWarrior && !isBoss) el.classList.add('warrior-cell');
-    el.innerHTML=`<div class="card-inner"><div class="card-back"></div><div class="card-face ${card.fc}">${card.emoji}</div></div>${isBoss?'<div class="boss-overlay">🧌</div>':''}`;
-    if(!isMatched && !isBoss) el.addEventListener('click',()=>onCard(i));
+    if(isRock && !isBoss) el.classList.add('rock-cell');
+    if(G.warriorMode && isMatched && !isBoss) el.classList.add('warrior-target');
+    el.innerHTML=`<div class="card-inner"><div class="card-back"></div><div class="card-face ${card.fc}">${card.emoji}</div></div>${isBoss?'<div class="boss-overlay">🧌</div>':''}${isWarrior&&!isBoss?'<div class="warrior-overlay">☁️</div>':''}${isRock&&!isBoss?'<div class="rock-overlay">🪨</div>':''}`;
+    if(G.warriorMode && !isBoss) el.addEventListener('click',()=>onCard(i));
+    else if(!isMatched && !isBoss && !isWarrior && !isRock) el.addEventListener('click',()=>onCard(i));
     g.appendChild(el);
   }
-  document.getElementById('pBadge').textContent=`${G.pairs} / 12 matched`;
+  document.getElementById('pBadge').textContent=`${Math.max(0,G.pairs)} / 9 matched`;
 }
 
 function renderBoss(){
   const pct=Math.max(0,G.hp/BOSS_MAX*100);
   document.getElementById('hpBar').style.width=pct+'%';
   document.getElementById('hpTxt').textContent=`${Math.max(0,G.hp)} / ${BOSS_MAX} HP`;
-  const e=G.hp<=0?'💥':G.hp<=4?'😵':G.hp<=8?'🧌':'🧌';
-  document.getElementById('bEmoji').textContent=e;
+  const e=G.hp<=0?'💥':G.hp<=4?'😵':'🧌';
+  const bEl=document.getElementById('bEmoji');
+  bEl.textContent=e;
+  bEl.className='boss-big'+(G.hp<=4&&G.hp>0?' critical':G.hp<=8&&G.hp>0?' cracked':'');
 }
 
 function renderShields(){
@@ -352,16 +448,15 @@ function renderShields(){
 
 function renderStatus(){
   const bar=document.getElementById('sbar'), txt=document.getElementById('stxt');
-  if(G.peek){ bar.className='status-bar s-wait'; txt.textContent=`⭐ Peek — ${3-G.peekN} left`; }
+  if(G.warriorMode){ bar.className='status-bar s-wait'; txt.textContent='☁️ Click a matched tile to place your Cloud Warrior!'; }
+  else if(G.peek){ bar.className='status-bar s-wait'; txt.textContent=`⭐ Peek — ${4-G.peekN} left`; }
   else if(G.phase==='player'){ bar.className='status-bar s-player'; txt.textContent=G.flipped.length===0?'Your turn — flip a tile!':'Flip one more tile!'; }
   else if(G.phase==='boss'){ bar.className='status-bar s-boss'; txt.textContent="Smashy's turn!"; }
   else{ bar.className='status-bar s-wait'; txt.textContent='Game over'; }
 }
 
 function renderLog(){
-  const el=document.getElementById('logbox');
-  const cls={g:'lg',b:'lb',n:'ln',i:'li'};
-  el.innerHTML=G.log.slice(-5).map(l=>`<div class="logline ${cls[l.t]}">${l.m}</div>`).join('');
+  // Battle log removed from UI - no-op
 }
 
 function renderPeek(){
@@ -377,18 +472,36 @@ function setDice(ri){
 
 function onCard(i){
   if(G.phase==='over') return;
+
+  // WARRIOR PLACEMENT MODE
+  if(G.warriorMode){
+    const {r,c}=rcOf(i);
+    const isBoss=(r===G.bossR && c===G.bossC);
+    if(isBoss || G.rocks.includes(i)) return;
+    if(!G.matched.has(i)){ addLog('☁️ Warriors can only be placed on matched tiles!','n'); return; }
+    const k=`${r},${c}`;
+    G.warriors[k]=true;
+    G.warriorMode=false;
+    addLog(`☁️ Cloud Warrior placed! Smashy will stop before stepping on it.`,'g');
+    showPopup('☁️','Warrior Placed!','Smashy will regret this!','#4da6ff');
+    render();
+    // Now trigger boss turn (warrior placement counts as the power resolution)
+    setTimeout(()=>bossTurn(),480);
+    return;
+  }
   if(G.peek){
     if(G.matched.has(i)||G.flipped.includes(i)||G.peekIdx.includes(i)) return;
+    if(G.peekN>=4) return; // already at limit, ignore extra clicks
     G.peekIdx.push(i); G.peekN++;
     const e=cardEl(i); e.classList.add('flipped','peeked');
     renderStatus();
-    if(G.peekN>=3){
+    if(G.peekN>=4){
       setTimeout(()=>{
         G.peekIdx.forEach(pi=>{ const x=cardEl(pi); if(x){x.classList.remove('flipped','peeked');} });
         G.peek=false; G.peekN=0; G.peekIdx=[];
         addLog('⭐ Peek ended — remember those tiles!','i');
         renderStatus(); renderPeek();
-      },2200);
+      },5000);
     }
     return;
   }
@@ -403,10 +516,13 @@ function onCard(i){
     if(G.cards[a].id===G.cards[b].id){
       setTimeout(()=>{
         G.matched.add(a); G.matched.add(b); G.pairs++;
+        G.lastMatched = [a, b];
         const id=G.cards[a].id; G.flipped=[]; G.canFlip=true;
         applyPower(id); render();
+        setTimeout(()=>{ G.lastMatched=[]; },600);
+        checkMilestone();
         if(checkWin()) return;
-        setTimeout(()=>bossTurn(),480);
+        if(!G.warriorMode) setTimeout(()=>bossTurn(), G.powerDelay);
       },400);
     } else {
       setTimeout(()=>{
@@ -419,34 +535,20 @@ function onCard(i){
 }
 
 function applyPower(id){
-  if(id==='lightning')   damageBoss(2,'⚡ Lightning Strike — 2 damage!');
-  else if(id==='warrior') placeWarrior();
-  else if(id==='shield')  { G.shields++; addLog(`🛡️ Wind Shield raised! ${G.shields} shield${G.shields>1?'s':''}!`,'g'); renderShields(); }
-  else if(id==='starmap') { G.peek=true; G.peekN=0; G.peekIdx=[]; addLog('⭐ Star Map! Click 3 tiles to peek...','i'); }
-  else if(id==='fireball'){ damageBoss(1,'🔥 Fireball — 1 damage!'); G.stunned=true; addLog('🔥 Boss stunned — skips next turn!','g'); }
-  else if(id==='comet'||id==='comet2') pushBack();
-  else if(id==='pulse')   damageBoss(3,'💜 Magic Pulse — 3 damage!');
+  G.powerDelay = 480; // default boss turn delay after power
+  if(id==='lightning'){   damageBoss(2,'⚡ Lightning Strike — 2 damage!'); showPopup('⚡','Lightning Strike!','-2 HP to Smashy','#8bc34a'); }
+  else if(id==='warrior'){ G.warriorMode=true; addLog('⚔️ Click a matched tile to place your Cloud Warrior!','i'); showPopup('☁️','Cloud Warrior!','Click a matched tile!','#4da6ff'); }
+  else if(id==='shield'){  G.shields++; addLog(`🛡️ Wind Shield raised! ${G.shields} shield${G.shields>1?'s':''}!`,'g'); renderShields(); showPopup('🛡️','Wind Shield!','Castle protected!','#b57bff'); }
+  else if(id==='starmap'){ G.peek=true; G.peekN=0; G.peekIdx=[]; addLog('⭐ Star Map! Click 4 tiles to peek...','i'); showPopup('⭐','Star Map!','Click 4 tiles to peek!','#f5c842'); }
+  else if(id==='fireball'){ damageBoss(3,'🌈 Rainbow Blast — 3 damage!'); showPopup('🌈','Rainbow Blast!','-3 HP to Smashy!','#ff8c42'); }
+  else if(id==='comet'){ damageBoss(1,'💫 Comet — 1 damage + pushback!'); pushBack(); showPopup('💫','Comet!','-1 HP + Smashy pushed back!','#c8a856'); G.powerDelay=1400; }
 }
 
-function placeWarrior(){
-  for(let r=G.bossR-1;r>=0;r--){
-    for(let dc=0;dc<=3;dc++){
-      for(const s of [dc,-dc]){
-        const c=G.bossC+s;
-        if(c<0||c>=COLS) continue;
-        const k=`${r},${c}`;
-        if(!G.warriors[k]){ G.warriors[k]=true; addLog(`⚔️ Cloud Warrior placed at row ${r}!`,'g'); return; }
-      }
-    }
-  }
-  const k=`0,${G.bossC}`; G.warriors[k]=true;
-  addLog('⚔️ Cloud Warrior guards the castle gates!','g');
-}
+
 
 function pushBack(){
-  if(G.bossR<ROWS-1){ G.bossR++; addLog('💫 Comet! Boss pushed back a row!','g'); }
-  else addLog('💫 Comet! Boss is already at the edge.','n');
-  render();
+  if(G.bossR<ROWS-1){ G.bossR++; addLog('Smashy pushed back a row!','g'); }
+  else addLog('Smashy is already at the far edge.','n');
 }
 
 function revealAll(){
@@ -460,7 +562,11 @@ function damageBoss(amt,msg){
   addLog(msg,'g');
   const e=document.getElementById('bEmoji');
   e.classList.add('dmg'); setTimeout(()=>e.classList.remove('dmg'),700);
+  // Screen shake
+  document.body.classList.add('shake');
+  setTimeout(()=>document.body.classList.remove('shake'),500);
   renderBoss();
+  updateTaunt();
 }
 
 function bossTurn(){
@@ -470,7 +576,6 @@ function bossTurn(){
 }
 
 function doBoss(){
-  if(G.stunned){ G.stunned=false; addLog('🔥 Boss stunned — skips turn!','n'); G.phase='player'; G.canFlip=true; renderStatus(); return; }
   G.phase='boss'; renderStatus();
   setTimeout(()=>{
     let ri=Math.floor(Math.random()*6);
@@ -482,49 +587,198 @@ function doBoss(){
 function execMove(ri){
   const d=DICE_DEF[ri];
 
-  if(d.swapLR){
-    const left  = findFaceDown(G.bossR, G.bossC, 0, -1);
-    const right = findFaceDown(G.bossR, G.bossC, 0,  1);
-    if(left!==null && right!==null){ swapIndices(left, right); addLog('↔️ Boss swaps nearest face-down tiles left & right!','b'); }
-    else addLog('↔️ Boss tried to swap left & right — no face-down tiles found!','n');
-    render(); return;
-  }
-  if(d.swapFB){
-    const front = findFaceDown(G.bossR, G.bossC, -1, 0);
-    const back  = findFaceDown(G.bossR, G.bossC,  1, 0);
-    if(front!==null && back!==null){ swapIndices(front, back); addLog('↕️ Boss swaps nearest face-down tiles front & back!','b'); }
-    else addLog('↕️ Boss tried to swap front & back — no face-down tiles found!','n');
-    render(); return;
-  }
-
-  let nr=G.bossR+d.dr, nc=G.bossC+d.dc;
-  nc=Math.max(0,Math.min(COLS-1,nc));
-  if(nr>=ROWS) nr=ROWS-1;
-
-  G.bossR=nr; G.bossC=nc;
-  const dirs=['slides left','slides right','charges ahead','charges ahead'];
-  addLog(`🧌 Boss ${dirs[ri]}! Row ${G.bossR}.`,'b');
-
-  // Check warrior
-  const wk=`${G.bossR},${G.bossC}`;
-  if(G.warriors[wk]){ delete G.warriors[wk]; damageBoss(3,'⚔️ Warrior intercepts — 3 damage!'); if(checkWin()) return; }
-
-  // Reached castle (row <= 0)
-  if(G.bossR<=0){
-    if(G.shields>0){
-      G.shields--; G.bossR=1;
-      addLog(`🛡️ Shield absorbs breach! ${G.shields} left.`,'g');
-      renderShields();
-    } else {
-      addLog('💀 Smashy storms the castle! GAME OVER!','b');
-      G.phase='over'; render();
-      setTimeout(()=>showOv(false),650); return;
+  if(d.swapAdj){
+    // Collect all face-down tiles adjacent to Smashy (up, down, left, right)
+    const dirs4=[[-1,0],[1,0],[0,-1],[0,1]];
+    const adjacent=[];
+    for(const [dr,dc] of dirs4){
+      const nr=G.bossR+dr, nc=G.bossC+dc;
+      if(nr<0||nr>=ROWS||nc<0||nc>=COLS) continue;
+      const idx=idxOf(nr,nc);
+      if(!G.matched.has(idx)&&!G.flipped.includes(idx)&&!G.rocks.includes(idx)) adjacent.push(idx);
     }
+    // Pick two: prefer adjacent pair, fall back to any face-down tiles
+    let a=adjacent.length>0?adjacent[Math.floor(Math.random()*adjacent.length)]:null;
+    let b=adjacent.filter(x=>x!==a).length>0
+      ? adjacent.filter(x=>x!==a)[Math.floor(Math.random()*adjacent.filter(x=>x!==a).length)]
+      : anyFaceDown([a]);
+    if(a===null) a=anyFaceDown([b]);
+    if(a!==null && b!==null && a!==b){
+      swapIndices(a, b, true);
+      addLog('↔️ Smashy swaps two tiles next to him!','b');
+      showBossPopup('↔️','Swap!','Nearby tiles mixed!');
+    } else {
+      addLog('↔️ Smashy tried to swap — not enough tiles!','n');
+      showBossPopup('↔️','Swap Failed!','No tiles to mix...');
+    }
+    smashyTaunt('swap'); render(); return;
   }
-  render();
+
+  if(d.rock){
+    const k=idxOf(G.bossR, G.bossC);
+    if(G.rocks.includes(k)){
+      // Already a rock here, nothing to do
+      showBossPopup('🪨','Rock Already Here!','Smashy grumbles...');
+      smashyTaunt('move'); render(); return;
+    }
+    if(G.rocks.length>=3){
+      // Remove oldest rock and place new one
+      G.rocks.shift();
+      G.rocks.push(k);
+      addLog(`🪨 Smashy moves his oldest rock to row ${G.bossR}!`,'b');
+      showBossPopup('🪨','Rock Moved!','Oldest rock relocated!');
+    } else {
+      G.rocks.push(k);
+      addLog(`🪨 Smashy drops a rock! Tile at row ${G.bossR} is blocked!`,'b');
+      showBossPopup('🪨','Rock Dropped!','That tile is blocked!');
+    }
+    smashyTaunt('move'); render(); return;
+  }
+
+  // TRIPLE STEP
+  if(d.step3){
+    showBossPopup('⬆️⬆️⬆️','Triple Step!','Smashy moves three times!');
+    for(let s=0; s<3; s++){
+      const next=serpentineNext(G.bossR, G.bossC);
+      if(next===null){ addLog('🧌 Smashy has nowhere to go!','b'); break; }
+      // Check warrior on next tile — stops Smashy before entry
+      const wk=`${next.r},${next.c}`;
+      if(G.warriors[wk]){
+        delete G.warriors[wk];
+        addLog('☁️ Cloud Warrior blocks Smashy! He stops in his tracks!','g');
+        showPopup('☁️','Blocked!','Cloud Warrior stops Smashy!','#4da6ff');
+        break;
+      }
+      G.bossR=next.r; G.bossC=next.c;
+      if(G.bossR<0){
+        if(G.shields>0){
+          G.shields--; G.bossR=0;
+          addLog(`🛡️ Wind Shield blocks Smashy! ${G.shields} left.`,'g');
+          renderShields();
+          showPopup('🛡️','Shield Activated!','Castle protected!','#b57bff');
+        } else {
+          addLog('💀 Smashy storms the castle! GAME OVER!','b');
+          G.phase='over'; render();
+          setTimeout(()=>showOv(false),650); return;
+        }
+        break;
+      }
+    }
+    addLog(`🧌 Smashy triple-steps! Now at row ${G.bossR}.`,'b');
+    smashyTaunt(G.bossR<=1?'close':'move');
+    render(); return;
+  }
+
+  // DOUBLE STEP
+  if(d.step2){
+    showBossPopup('⬆️⬆️','Double Step!','Smashy moves twice!');
+    for(let s=0; s<2; s++){
+      const next=serpentineNext(G.bossR, G.bossC);
+      if(next===null){ addLog('🧌 Smashy has nowhere to go!','b'); break; }
+      const wk=`${next.r},${next.c}`;
+      if(G.warriors[wk]){
+        delete G.warriors[wk];
+        addLog('☁️ Cloud Warrior blocks Smashy! He stops in his tracks!','g');
+        showPopup('☁️','Blocked!','Cloud Warrior stops Smashy!','#4da6ff');
+        break;
+      }
+      G.bossR=next.r; G.bossC=next.c;
+      if(G.bossR<0){
+        if(G.shields>0){
+          G.shields--; G.bossR=0;
+          addLog(`🛡️ Wind Shield blocks Smashy! ${G.shields} left.`,'g');
+          renderShields();
+          showPopup('🛡️','Shield Activated!','Castle protected!','#b57bff');
+        } else {
+          addLog('💀 Smashy storms the castle! GAME OVER!','b');
+          G.phase='over'; render();
+          setTimeout(()=>showOv(false),650); return;
+        }
+        break;
+      }
+    }
+    addLog(`🧌 Smashy double-steps! Now at row ${G.bossR}.`,'b');
+    smashyTaunt(G.bossR<=1?'close':'move');
+    render(); return;
+  }
+
+  // SINGLE STEP
+  if(d.step){
+    const next = serpentineNext(G.bossR, G.bossC);
+    if(next===null){
+      addLog('🧌 Smashy has nowhere to go!','b');
+      showBossPopup('⬆️','Stuck!','No moves left!');
+      smashyTaunt('move'); render(); return;
+    }
+    // Check warrior before moving
+    const wk=`${next.r},${next.c}`;
+    if(G.warriors[wk]){
+      delete G.warriors[wk];
+      addLog('☁️ Cloud Warrior blocks Smashy! He stops in his tracks!','g');
+      showPopup('☁️','Blocked!','Cloud Warrior stops Smashy!','#4da6ff');
+      smashyTaunt('move'); render(); return;
+    }
+    G.bossR=next.r; G.bossC=next.c;
+    addLog(`🧌 Smashy charges ahead! Row ${G.bossR}.`,'b');
+    showBossPopup('⬆️','Charge!',`Now at row ${G.bossR}, col ${G.bossC}`);
+    smashyTaunt(G.bossR<=1?'close':'move');
+    if(G.bossR<0){
+      if(G.shields>0){
+        G.shields--; G.bossR=0;
+        addLog(`🛡️ Wind Shield blocks Smashy at the gates! ${G.shields} left.`,'g');
+        renderShields();
+        showPopup('🛡️','Shield Activated!','Castle protected!','#b57bff');
+      } else {
+        addLog('💀 Smashy storms the castle! GAME OVER!','b');
+        G.phase='over'; render();
+        setTimeout(()=>showOv(false),650); return;
+      }
+    }
+    render(); return;
+  }
+} // end execMove
+
+
+// Serpentine movement: rows from bottom alternate direction
+// Row 5 (start): left→right, Row 4: right→left, Row 3: left→right, etc.
+function serpentineNext(r, c){
+  const goingRight = ((ROWS - 1 - r) % 2 === 0);
+  const nextC = goingRight ? c + 1 : c - 1;
+  // Continue along row if not rocked (matched tiles are walkable)
+  if(nextC >= 0 && nextC < COLS && !G.rocks.includes(idxOf(r, nextC))){
+    return {r, c: nextC};
+  }
+  // Step up one row
+  const nextR = r - 1;
+  if(nextR < 0) return {r: -1, c}; // signal castle reached
+  const newGoingRight = ((ROWS - 1 - nextR) % 2 === 0);
+  const entryC = newGoingRight ? 0 : COLS - 1;
+  if(!G.rocks.includes(idxOf(nextR, entryC))) return {r: nextR, c: entryC};
+  const altC = newGoingRight ? 1 : COLS - 2;
+  if(altC >= 0 && altC < COLS && !G.rocks.includes(idxOf(nextR, altC))) return {r: nextR, c: altC};
+  return null;
 }
 
-// Scan outward from boss in direction (dr,dc), skipping face-up/matched/boss tiles,
+function anyFaceDown(exclude=[]){
+  const pool=[];
+  for(let i=0;i<TOTAL;i++){
+    const {r,c}=rcOf(i);
+    if(G.matched.has(i)) continue;
+    if(G.flipped.includes(i)) continue;
+    if(r===G.bossR && c===G.bossC) continue;
+    if(exclude.includes(i)) continue;
+    pool.push(i);
+  }
+  if(pool.length===0) return null;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+// Boss action popup — styled red/orange to distinguish from player power popups
+function showBossPopup(emoji, title, sub){
+  showPopup(emoji, title, sub, '#ff8866');
+}
+
+
 // returning the index of the first face-down tile found (or null if none).
 function findFaceDown(fromR, fromC, dr, dc){
   let r=fromR+dr, c=fromC+dc;
@@ -537,19 +791,106 @@ function findFaceDown(fromR, fromC, dr, dc){
   return null;
 }
 
-function swapIndices(i1, i2){
-  [i1,i2].forEach(i=>{ const e=cardEl(i); if(e) e.classList.add('scrambling'); });
+function swapIndices(i1, i2, highlight=false){
+  const els=[cardEl(i1),cardEl(i2)];
+  els.forEach(e=>{ if(e) e.classList.add('scrambling'); });
+
+  // Draw swap arrow graphic between the two cards
+  if(highlight) showSwapArrow(i1, i2);
+
   setTimeout(()=>{
     const tmp={id:G.cards[i1].id, emoji:G.cards[i1].emoji, fc:G.cards[i1].fc};
     G.cards[i1].id=G.cards[i2].id; G.cards[i1].emoji=G.cards[i2].emoji; G.cards[i1].fc=G.cards[i2].fc;
     G.cards[i2].id=tmp.id; G.cards[i2].emoji=tmp.emoji; G.cards[i2].fc=tmp.fc;
     G.flipped=G.flipped.filter(f=>f!==i1&&f!==i2);
-    [i1,i2].forEach(i=>{ const e=cardEl(i); if(e) e.classList.remove('scrambling'); });
+    els.forEach(e=>{ if(e) e.classList.remove('scrambling'); });
     renderGrid();
   },490);
 }
 
+function showSwapArrow(i1, i2){
+  const e1=cardEl(i1), e2=cardEl(i2);
+  if(!e1||!e2) return;
+  const r1=e1.getBoundingClientRect(), r2=e2.getBoundingClientRect();
+  const cx1=r1.left+r1.width/2, cy1=r1.top+r1.height/2;
+  const cx2=r2.left+r2.width/2, cy2=r2.top+r2.height/2;
 
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:400;';
+
+  // Defs for arrowheads
+  svg.innerHTML=`
+    <defs>
+      <marker id="ah1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6 Z" fill="#FFD700"/>
+      </marker>
+      <marker id="ah2" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+        <path d="M0,0 L6,3 L0,6 Z" fill="#FFD700"/>
+      </marker>
+    </defs>
+    <line x1="${cx1}" y1="${cy1}" x2="${cx2}" y2="${cy2}"
+      stroke="#FFD700" stroke-width="3" stroke-dasharray="6,4" opacity="0.9"
+      marker-end="url(#ah1)"/>
+    <line x1="${cx2}" y1="${cy2}" x2="${cx1}" y2="${cy1}"
+      stroke="#ff8c42" stroke-width="3" stroke-dasharray="6,4" opacity="0.9"
+      marker-end="url(#ah2)"/>
+    <circle cx="${cx1}" cy="${cy1}" r="10" fill="none" stroke="#FFD700" stroke-width="2.5" opacity="0.9"/>
+    <circle cx="${cx2}" cy="${cy2}" r="10" fill="none" stroke="#ff8c42" stroke-width="2.5" opacity="0.9"/>
+  `;
+  document.body.appendChild(svg);
+  // Fade out and remove
+  svg.style.transition='opacity 0.3s';
+  setTimeout(()=>{ svg.style.opacity='0'; },400);
+  setTimeout(()=>{ svg.remove(); },750);
+}
+
+
+
+// ── POPUP ────────────────────────────────────────────────────────────────────
+let popupTimer=null;
+function showPopup(emoji, title, sub, color='white'){
+  const el=document.getElementById('powerPopup');
+  document.getElementById('ppEmoji').textContent=emoji;
+  document.getElementById('ppTitle').textContent=title;
+  document.getElementById('ppTitle').style.color=color;
+  document.getElementById('ppSub').textContent=sub;
+  el.className='power-popup'; // reset
+  void el.offsetWidth; // reflow
+  el.classList.add('show');
+  if(popupTimer) clearTimeout(popupTimer);
+  popupTimer=setTimeout(()=>{ el.className='power-popup'; },1800);
+}
+
+// ── TAUNTS ───────────────────────────────────────────────────────────────────
+const TAUNTS = {
+  move:  ['Heh heh heh...🧌','Nothing can stop me!','STOMP STOMP STOMP!','Coming for you! 🧌','Keep trying, tiny ones!'],
+  close: ['Almost there! 🧌','I can SEE the castle!','MWAHAHA! 🧌','Your castle is MINE!','Try and stop me now!'],
+  swap:  ['Tee hee! Mixed it up!','Bet you forgot now! 😏','Swap swap swap! 🧌','Good luck with THAT!','My favourite trick! 🧌'],
+  hurt:  ['Ow! That tickled!','Lucky shot!','Grr... stop that!','You got me! ...For now.','OUCH! 🧌'],
+  start: ['😤 I will squash your castle!','Prepare yourself! 🧌','You cannot stop me!'],
+};
+function smashyTaunt(type){
+  const list=TAUNTS[type]||TAUNTS.move;
+  const msg=list[Math.floor(Math.random()*list.length)];
+  document.getElementById('tauntBubble').textContent=msg;
+}
+function updateTaunt(){ smashyTaunt('hurt'); }
+
+// ── MILESTONE ────────────────────────────────────────────────────────────────
+const MILESTONES = { 3:'3 pairs! Keep going! 🌟', 6:'Halfway there! ⚡', 9:'All pairs matched! 🎉' };
+let milestoneTimer=null;
+function checkMilestone(){
+  const msg=MILESTONES[G.pairs];
+  if(!msg) return;
+  const el=document.getElementById('milestone');
+  el.textContent=msg;
+  el.className='milestone show';
+  if(milestoneTimer) clearTimeout(milestoneTimer);
+  milestoneTimer=setTimeout(()=>{
+    el.classList.add('hide');
+    setTimeout(()=>el.className='milestone',400);
+  },2200);
+}
 
 function checkWin(){
   if(G.hp<=0){ G.phase='over'; render(); setTimeout(()=>showOv(true),380); return true; }
