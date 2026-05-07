@@ -14,6 +14,14 @@ document.querySelectorAll('.fade-up').forEach(el => revealObserver.observe(el));
 // ===== FEATURED SLIDER =====
 const sliderTrack = document.getElementById('sliderTrack');
 if (sliderTrack) {
+  // Shuffle slides into random order on each page load
+  const slideArray = Array.from(sliderTrack.querySelectorAll('.slider-slide'));
+  for (let i = slideArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    sliderTrack.appendChild(slideArray[j]);
+    [slideArray[i], slideArray[j]] = [slideArray[j], slideArray[i]];
+  }
+
   const slides = sliderTrack.querySelectorAll('.slider-slide');
   const total = slides.length;
   let current = 0;
