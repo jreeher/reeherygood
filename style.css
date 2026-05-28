@@ -798,10 +798,11 @@ section { padding: 5rem 2rem; }
   box-shadow: 0 8px 24px rgba(196,101,74,0.25);
 }
 .game-preview.screen-tax img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  border-radius: 28px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 .tf-stars {
   display: flex;
@@ -825,7 +826,7 @@ section { padding: 5rem 2rem; }
   box-shadow: 0 8px 24px rgba(196,101,74,0.25);
 }
 .game-preview.screen-tax {
-  background: #0d7a6e;
+  background: #007a6e;
 }
 .screen-tax-bars {
   display: flex;
