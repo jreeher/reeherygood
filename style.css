@@ -771,13 +771,18 @@ section { padding: 5rem 2rem; }
   overflow: hidden;
   flex-shrink: 0;
 }
+.game-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
 .game-preview.american-dream {
-  background: linear-gradient(160deg, #87CEEB 0%, #4a90d9 50%, #1a3b6e 100%);
+  background: #0d1117;
 }
 .game-preview.tickle-fight {
-  background: linear-gradient(160deg, #0d1b2a 0%, #162032 60%, #1e2d42 100%);
-  flex-direction: column;
-  gap: 0.6rem;
+  background: #ffffff;
 }
 .tf-stars {
   display: flex;
@@ -801,11 +806,7 @@ section { padding: 5rem 2rem; }
   box-shadow: 0 8px 24px rgba(196,101,74,0.25);
 }
 .game-preview.screen-tax {
-  background: linear-gradient(160deg, #1a1a2e 0%, #0d0d1a 100%);
-  position: relative;
-  justify-content: center;
-  align-items: flex-end;
-  padding-bottom: 28px;
+  background: #0d7a6e;
 }
 .screen-tax-bars {
   display: flex;
