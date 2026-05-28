@@ -784,6 +784,20 @@ section { padding: 5rem 2rem; }
 .game-preview.tickle-fight {
   background: #ffffff;
 }
+.game-preview.tickle-fight img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+.game-preview.simmer-down img,
+.game-preview.screen-tax img {
+  width: 130px;
+  height: 130px;
+  object-fit: contain;
+  border-radius: 28px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+}
 .tf-stars {
   display: flex;
   gap: 10px;
