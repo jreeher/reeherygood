@@ -565,9 +565,9 @@ section { padding: 5rem 2rem; }
 .books-hero h1 { text-shadow: 3px 3px 0 rgba(199,125,255,0.6); }
 
 .projects-hero {
-  background: linear-gradient(135deg, #0D3B00 0%, #1C5C00 60%, #0D3B00 100%);
+  background: #81b29a;
 }
-.projects-hero h1 { text-shadow: 3px 3px 0 rgba(107,203,119,0.6); }
+.projects-hero h1 { text-shadow: 3px 3px 0 rgba(27,67,50,0.35); }
 
 /* ===== BOOKS GRID ===== */
 .books-grid {
