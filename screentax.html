@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Screen Tax &mdash; An Android app that charges you for wasted screen time</title>
+  <meta name="description" content="Screen Tax is a free Android app that charges you for time on your most distracting apps, then donates what's left to a cause you choose. Billed monthly, capped at $25.">
+  <link rel="canonical" href="https://invert-able.com/screentax.html">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="njoy-favicon.png">
+
+  <style>
+    /* Page-specific styles for the Screen Tax page. Palette and fonts come from style.css. */
+    .st-hero {
+      background: #007a6e;
+      padding: 4.5rem 2rem 4rem;
+    }
+    .st-hero-icon {
+      width: 104px;
+      height: 104px;
+      border-radius: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.22);
+      margin-bottom: 1.4rem;
+      position: relative;
+      z-index: 1;
+    }
+    .st-hero h1 { text-shadow: 3px 3px 0 rgba(27,67,50,0.35); }
+    .st-hero p {
+      color: rgba(255,255,255,0.93);
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .st-hero .st-lede { font-size: 1.05rem; font-weight: 600; margin-top: 1.1rem; }
+    .st-hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .st-section { padding: 4rem 1.5rem; }
+    .st-section.st-alt { background: #ffffff; }
+    .st-wrap { max-width: 920px; margin: 0 auto; }
+    .st-wrap h2 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+      line-height: 1.2;
+      letter-spacing: 0.5px;
+      margin-bottom: 1rem;
+    }
+    .st-wrap p { font-size: 1.05rem; line-height: 1.7; margin-bottom: 1rem; }
+    .st-sub { color: #555; font-weight: 600; margin-bottom: 2rem !important; }
+
+    .st-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1.6rem;
+      margin-top: 1.5rem;
+    }
+    .st-card {
+      background: #ffffff;
+      border: 3px solid var(--navy);
+      border-radius: 20px;
+      box-shadow: 6px 6px 0 var(--navy);
+      padding: 1.6rem 1.4rem;
+    }
+    .st-alt .st-card { background: var(--cream); }
+    .st-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+    .st-card p { font-size: 0.98rem; color: #444; line-height: 1.6; margin: 0; }
+    .st-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #FFB800;
+      color: var(--navy);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .st-facts { list-style: none; margin-top: 1.5rem; }
+    .st-facts li {
+      display: grid;
+      grid-template-columns: 11rem 1fr;
+      gap: 0.4rem 1.5rem;
+      padding: 1.05rem 0;
+      border-top: 2px solid rgba(27,67,50,0.15);
+      line-height: 1.65;
+    }
+    .st-facts li:last-child { border-bottom: 2px solid rgba(27,67,50,0.15); }
+    .st-facts strong { font-family: 'Playfair Display', serif; font-size: 1.05rem; }
+
+    .st-example {
+      background: var(--mist);
+      border-left: 6px solid var(--sage);
+      border-radius: 0 14px 14px 0;
+      padding: 1rem 1.3rem;
+      margin: 1.5rem 0 0;
+      font-size: 1rem;
+      line-height: 1.65;
+    }
+
+    .st-table-scroll { overflow-x: auto; margin-top: 1.5rem; }
+    .st-table { width: 100%; border-collapse: collapse; min-width: 420px; background: #fff; border: 3px solid var(--navy); border-radius: 14px; }
+    .st-table th, .st-table td { text-align: left; padding: 0.8rem 1rem; border-bottom: 2px solid rgba(27,67,50,0.12); font-size: 1rem; }
+    .st-table td:last-child, .st-table th:last-child { text-align: right; white-space: nowrap; }
+    .st-table tr:last-child td { border-bottom: none; font-weight: 800; background: var(--mist); }
+    .st-table th { background: var(--navy); color: #fff; font-family: 'Playfair Display', serif; font-weight: 500; letter-spacing: 1px; }
+
+    .st-list { margin: 0.5rem 0 1rem 1.2rem; }
+    .st-list li { font-size: 1.02rem; line-height: 1.7; margin-bottom: 0.55rem; }
+
+    details.st-faq {
+      background: #fff;
+      border: 3px solid var(--navy);
+      border-radius: 16px;
+      padding: 0.2rem 1.3rem;
+      margin-bottom: 1rem;
+    }
+    details.st-faq summary {
+      cursor: pointer;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.95rem 0;
+    }
+    details.st-faq p { margin: 0 0 1.1rem; color: #444; font-size: 1rem; }
+
+    .st-wrap p a, .st-wrap li a {
+      color: var(--navy);
+      font-weight: 800;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    @media (max-width: 650px) {
+      .st-facts li { grid-template-columns: 1fr; }
+      .st-hero { padding: 3.5rem 1.2rem 3rem; }
+      .st-section { padding: 3rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVIGATION ===== -->
+  <nav>
+    <a href="index.html" class="nav-logo">JR</a>
+    <div class="hamburger" id="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="books.html">Books</a></li>
+      <li><a href="projects.html" class="active">Projects</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <!-- ===== HERO ===== -->
+    <div class="page-hero st-hero">
+      <img src="screentax-icon.png" alt="Screen Tax app icon" class="st-hero-icon">
+      <h1>Screen Tax</h1>
+      <p>Screen time was never free &mdash; but now it actually hurts.</p>
+      <p class="st-lede">A free Android app that charges you for time on your most distracting apps, then donates what&rsquo;s left to a cause you choose.</p>
+      <div class="st-hero-cta hero-cta">
+        <a href="https://drive.google.com/drive/folders/1tyuXOZUxpHife_8fUaZm9tb2VKq1mLMi?usp=sharing"
+           class="btn btn-yellow" target="_blank" rel="noopener noreferrer">Download for Android</a>
+        <a href="#billing" class="btn btn-ghost">How billing works</a>
+      </div>
+    </div>
+
+    <!-- ===== WHAT IT IS ===== -->
+    <section class="st-section">
+      <div class="st-wrap">
+        <h2>What it is</h2>
+        <p>
+          Screen Tax is a self-imposed accountability tool. You choose the apps that tend to eat your day,
+          decide how many minutes of each are free every day, and set an hourly rate for any time beyond that.
+          The extra time is added to your tab, and once a month your card is charged for it.
+        </p>
+        <p>
+          You set every rule yourself, so the &ldquo;tax&rdquo; is entirely in your control. After payment-processing
+          and service fees, the money is donated to a cause you pick during setup.
+        </p>
+
+        <div class="st-grid">
+          <div class="st-card">
+            <div class="st-num">1</div>
+            <h3>Pick your apps</h3>
+            <p>Choose which apps count, give each a free daily allowance in minutes, and set an hourly rate.</p>
+          </div>
+          <div class="st-card">
+            <div class="st-num">2</div>
+            <h3>Use your phone</h3>
+            <p>Screen Tax measures how long each tracked app is open. Time inside your daily allowance is always free.</p>
+          </div>
+          <div class="st-card">
+            <div class="st-num">3</div>
+            <h3>Get charged monthly</h3>
+            <p>On the 1st of each month, your card is charged once for the month that just ended.</p>
+          </div>
+          <div class="st-card">
+            <div class="st-num">4</div>
+            <h3>It gets donated</h3>
+            <p>What remains after fees goes to the charity you chose: hunger relief, PETA, or the NRA Foundation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== BILLING ===== -->
+    <section class="st-section st-alt" id="billing">
+      <div class="st-wrap">
+        <h2>Billing, in plain terms</h2>
+        <p class="st-sub">Free to download. You only pay for time beyond your own allowances.</p>
+
+        <ul class="st-facts">
+          <li>
+            <strong>How a charge is figured</strong>
+            <span>For each tracked app, each day: minutes used, minus your free allowance (never below zero), divided by 60, times your hourly rate. Days add up over the calendar month.</span>
+          </li>
+          <li>
+            <strong>When you&rsquo;re charged</strong>
+            <span>Once a month, on the 1st at about 6:00 AM your local time, for the month that just ended. If the app can&rsquo;t run at that moment, the charge is attempted the next time you open it &mdash; still for the same month.</span>
+          </li>
+          <li>
+            <strong>Minimum</strong>
+            <span>Months that total less than $0.50 are skipped and are not carried forward.</span>
+          </li>
+          <li>
+            <strong>Monthly cap</strong>
+            <span>You will never be charged more than $25.00 in a month, no matter how much you use your phone.</span>
+          </li>
+          <li>
+            <strong>If a charge fails</strong>
+            <span>Screen Tax retries automatically once a day, up to five more times. If every attempt fails, the charge is marked failed and automatic attempts stop. You can still retry it yourself from Settings.</span>
+          </li>
+          <li>
+            <strong>If you uninstall</strong>
+            <span>Charges are started by the app on your phone. If you uninstall before a month&rsquo;s charge is processed, that charge is not collected.</span>
+          </li>
+        </ul>
+
+        <div class="st-example">
+          <strong>Example:</strong> an app with 30 free minutes a day and a $2.00 hourly rate. On a day you use it for 90 minutes,
+          60 minutes are billable (90 &minus; 30), so that day adds $2.00 to the month&rsquo;s total (60 &divide; 60 &times; $2.00).
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== WHERE THE MONEY GOES ===== -->
+    <section class="st-section" id="donations">
+      <div class="st-wrap">
+        <h2>Where the money goes</h2>
+        <p>
+          During setup you choose one destination for your donations: a hunger-relief charity fund, PETA, or the NRA Foundation.
+          You can change it at any time in Settings. Charges are collected and donated in aggregate to the organization you chose.
+        </p>
+        <p>Before anything is donated, two fees are deducted from each charge:</p>
+        <ul class="st-list">
+          <li><strong>Payment processing fee:</strong> about 2.9% + $0.30 per transaction, charged by our payment processor, Stripe.</li>
+          <li><strong>Platform service fee:</strong> 10% of the charge, kept by Invert LLC to cover infrastructure, maintenance and operating costs.</li>
+        </ul>
+
+        <div class="st-table-scroll">
+          <table class="st-table">
+            <caption style="text-align:left; font-weight:700; padding-bottom:0.6rem;">Example: a $5.00 monthly charge</caption>
+            <thead>
+              <tr><th scope="col">Item</th><th scope="col">Amount</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Amount charged</td><td>$5.00</td></tr>
+              <tr><td>Payment processing fee (about 2.9% + $0.30)</td><td>&minus; $0.45</td></tr>
+              <tr><td>Platform service fee (10%)</td><td>&minus; $0.50</td></tr>
+              <tr><td>Donated to your chosen cause</td><td>about $4.05</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p style="margin-top:1.4rem;">
+          Donations are made by Screen Tax in aggregate, not by you individually, so they are not tax-deductible to you and you won&rsquo;t receive a donation receipt.
+          We don&rsquo;t guarantee a specific disbursement date.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== REFUNDS ===== -->
+    <section class="st-section st-alt" id="refunds">
+      <div class="st-wrap">
+        <h2>Refunds</h2>
+        <p>
+          Every charge is eligible for a <strong>full refund if you ask within 7 days</strong> of the charge date.
+          Email <a href="mailto:jordanr@invert-able.com">jordanr@invert-able.com</a> from the address on your Screen Tax account.
+          Requests after 7 days may still be considered at Invert LLC&rsquo;s discretion.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== PRIVACY ===== -->
+    <section class="st-section" id="privacy">
+      <div class="st-wrap">
+        <h2>Your data</h2>
+        <p class="st-sub">Your per-app screen time never leaves your phone.</p>
+        <ul class="st-list">
+          <li><strong>Stays on your device:</strong> the minutes you spend in each app, and your charge history.</li>
+          <li><strong>Your account:</strong> Screen Tax uses an email address and password to link your saved payment method across the app and web dashboard, and to restore it if you reinstall.</li>
+          <li><strong>What our server holds:</strong> your account, your per-app settings (so they can be restored), payment identifiers, the dollar amount of a month at the moment it is charged, your donation choice, and a notification token for your device.</li>
+          <li><strong>Your card:</strong> card details are collected and stored by Stripe. Screen Tax keeps only a Stripe customer ID, the last four digits, and the card brand.</li>
+          <li><strong>Google Firebase</strong> is used for push notifications, crash reports and analytics. Crash reports can include a month&rsquo;s charge amount.</li>
+          <li><strong>No ads, no selling:</strong> we don&rsquo;t use advertising networks or cross-app tracking, and we don&rsquo;t sell your data.</li>
+        </ul>
+        <p>
+          To delete your account and server-side data, email <a href="mailto:jordanr@invert-able.com">jordanr@invert-able.com</a>.
+          Read the full <a href="https://jreeher.github.io/screentax-legal/tos.html">Terms of Service</a> and <a href="https://jreeher.github.io/screentax-legal/privacy.html">Privacy Policy</a>; both are also shown during setup in the app and are always available under Settings.
+        </p>
+      </div>
+    </section>
+
+    <!-- ===== REQUIREMENTS + FAQ ===== -->
+    <section class="st-section st-alt" id="faq">
+      <div class="st-wrap">
+        <h2>Requirements</h2>
+        <ul class="st-list">
+          <li>An Android phone running Android 8.0 or newer.</li>
+          <li>The <strong>Usage Access</strong> permission, which you turn on yourself in Android Settings so the app can measure time in your tracked apps.</li>
+          <li>You must be 18 or older and live in the United States, with a credit or debit card that can be charged in US dollars.</li>
+        </ul>
+
+        <h2 style="margin-top:2.5rem;">Questions</h2>
+
+        <details class="st-faq">
+          <summary>What counts as screen time?</summary>
+          <p>Only the time a tracked app is open in the foreground, as reported by Android. Apps you don&rsquo;t choose to track are never charged.</p>
+        </details>
+
+        <details class="st-faq">
+          <summary>Can I be charged more than $25 in a month?</summary>
+          <p>No. The monthly charge is capped at $25.00 regardless of usage.</p>
+        </details>
+
+        <details class="st-faq">
+          <summary>What if my month comes to less than $0.50?</summary>
+          <p>It&rsquo;s skipped &mdash; nothing is charged and the amount is not carried into the next month.</p>
+        </details>
+
+        <details class="st-faq">
+          <summary>Can I change my apps, allowances or rates?</summary>
+          <p>Yes, any time in the app. Changes apply going forward; days that have already ended keep the charge they had when they ended.</p>
+        </details>
+
+        <details class="st-faq">
+          <summary>How do I get help?</summary>
+          <p class="st-contact">Email <a href="mailto:jordanr@invert-able.com">jordanr@invert-able.com</a> for support, refund requests, or account deletion.</p>
+        </details>
+
+        <p class="st-contact" style="margin-top:2rem;">Screen Tax is operated by Invert LLC. Billing details last updated October 2026.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-logo">Invert LLC</div>
+    <p>Made with creativity, chaos, and questionable amounts of coffee.</p>
+    <p style="margin-top: 0.6rem;">
+      <a href="index.html">Home</a> &nbsp;&middot;&nbsp;
+      <a href="books.html">Books</a> &nbsp;&middot;&nbsp;
+      <a href="projects.html">Projects</a> &nbsp;&middot;&nbsp;
+      <a href="https://jreeher.github.io/screentax-legal/tos.html">Terms</a> &nbsp;&middot;&nbsp;
+      <a href="https://jreeher.github.io/screentax-legal/privacy.html">Privacy</a>
+    </p>
+    <p style="margin-top: 0.8rem; font-size: 0.8rem;">&copy; 2026 Invert LLC. Screen Tax is a product of Invert LLC.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
