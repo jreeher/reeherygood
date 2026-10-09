@@ -158,8 +158,8 @@
   <h2>5. Data Retention</h2>
   <ul>
     <li>App usage records are stored locally and can be deleted by the user from within the app's Settings screen.</li>
-    <li>Charge records are retained as required for transaction and refund records.</li>
-    <li>If you uninstall the app, local data is deleted automatically by Android and no further charges are initiated. Charge records on our backend persist until you request their deletion.</li>
+    <li>Our backend keeps no database of its own. Stripe retains customer and charge records for transaction and refund purposes, per its own retention policy.</li>
+    <li>If you uninstall the app, local data is deleted automatically by Android and no further charges are initiated. Your Stripe customer record and charge history persist until you request their deletion.</li>
   </ul>
 
   <h2>6. Children's Privacy</h2>
@@ -173,7 +173,7 @@
   <ul>
     <li>Delete specific days of usage data from Settings → Data.</li>
     <li>Update or remove your payment card at any time.</li>
-    <li>Contact us with your Customer ID to request deletion of your backend charge records and saved card.</li>
+    <li>Contact us with your Customer ID to request deletion of your Stripe customer record, charge history and saved card.</li>
   </ul>
 
   <h2>9. Changes to This Policy</h2>
