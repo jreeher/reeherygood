@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Screen Tax — Privacy Policy</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f9f9f9;
+      color: #1a1a1a;
+      line-height: 1.7;
+    }
+    header {
+      background: #005F57;
+      color: #fff;
+      padding: 40px 24px 32px;
+      text-align: center;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+    header p  { color: rgba(255,255,255,0.75); margin-top: 6px; font-size: 0.95rem; }
+    .gold { color: #FFB800; }
+    main {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 24px 60px;
+    }
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #005F57;
+      margin: 36px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    p { margin-bottom: 14px; }
+    ul { margin: 10px 0 14px 24px; }
+    li { margin-bottom: 8px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.92rem;
+    }
+    th {
+      background: #005F57;
+      color: #fff;
+      padding: 10px 14px;
+      text-align: left;
+    }
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #e0e0e0;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: #f2f2f2; }
+    .callout {
+      background: #e8f5e9;
+      border-left: 4px solid #005F57;
+      padding: 14px 18px;
+      margin: 20px 0;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+    a { color: #005F57; }
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.85rem;
+      color: #888;
+      border-top: 1px solid #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1><span class="gold">Screen</span> Tax</h1>
+  <p>Privacy Policy</p>
+</header>
+
+<main>
+
+  <p><strong>Last updated: October 2026</strong></p>
+
+  <p>This Privacy Policy explains how Invert LLC, the operator of Screen Tax ("we," "us," or "our"), collects, uses, and protects information when you use our mobile application. We built Screen Tax with a minimal-data philosophy — your detailed screen time data stays on your device.</p>
+
+  <div class="callout">
+    <strong>The short version:</strong> Your per-app screen time data and app settings never leave your phone. There are no accounts — we don't collect your email address or a password. We send only what's needed to charge your card, plus crash diagnostics. Details below.
+  </div>
+
+  <h2>1. Information We Collect</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data Type</th>
+        <th>What It Is</th>
+        <th>Where It's Stored</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>App Usage Data</strong></td>
+        <td>Daily foreground minutes per app, collected via Android's Usage Access permission</td>
+        <td>On your device only (local Room database)</td>
+      </tr>
+      <tr>
+        <td><strong>App Settings</strong></td>
+        <td>Which apps you track, free allowance minutes, hourly rates</td>
+        <td>On your device only</td>
+      </tr>
+      <tr>
+        <td><strong>Payment Identifiers</strong></td>
+        <td>Payment processor Customer ID, last four digits of your card, card brand (e.g. Visa)</td>
+        <td>On your device (DataStore). Our backend receives a signed token identifying your Customer ID with each charge request</td>
+      </tr>
+      <tr>
+        <td><strong>Monthly Charge Amount</strong></td>
+        <td>The dollar amount of a completed month, sent only at the moment a charge is initiated</td>
+        <td>Our backend server (Railway) — used to process that charge</td>
+      </tr>
+      <tr>
+        <td><strong>Payment History</strong></td>
+        <td>Charge timestamps, amounts, and success/failure status</td>
+        <td>On your device (local Room database). Stripe also keeps a record of each charge</td>
+      </tr>
+      <tr>
+        <td><strong>Crash &amp; Diagnostic Data</strong></td>
+        <td>Crash reports and error traces, which include your monthly charge amount</td>
+        <td>Google Firebase Crashlytics and Google Analytics for Firebase</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Information We Do NOT Collect</h2>
+  <ul>
+    <li>We do not collect your name, phone number, location, contacts, photos, or files.</li>
+    <li>We do not store your full card number, CVV, or billing address — this is handled entirely by our payment processor.</li>
+    <li>We do not transmit your detailed per-app usage history to any server. Only the final monthly dollar amount is sent, at charge time.</li>
+    <li>We do not use advertising SDKs and we do not track you across other apps or websites.</li>
+    <li>We do not sell your data to any third party.</li>
+  </ul>
+
+  <h2>3. How We Use Your Information</h2>
+  <ul>
+    <li><strong>Processing monthly charges:</strong> When a completed month is charged on the 1st, the amount is sent to our backend to process that charge.</li>
+    <li><strong>Diagnostics:</strong> Crash reports are used to find and fix defects in the app.</li>
+    <li><strong>App functionality:</strong> Usage data is used solely within the app to calculate charges and display your dashboard.</li>
+  </ul>
+
+  <h2>4. Third-Party Services</h2>
+  <p><strong>Stripe</strong> — We use Stripe to process all payments. When you set up a card, Stripe collects and stores your payment information directly. We receive only a Customer ID and card display info (last 4 digits, brand) in return. Stripe's Privacy Policy is available at <a href="https://stripe.com/privacy" target="_blank">stripe.com/privacy</a>.</p>
+  <p><strong>Google Firebase</strong> — We use Firebase Crashlytics for crash reporting and Google Analytics for Firebase. Crash reports include your monthly charge amount. Google's privacy practices are described at <a href="https://firebase.google.com/support/privacy" target="_blank">firebase.google.com/support/privacy</a>.</p>
+  <p>We do not use advertising networks or cross-app tracking services.</p>
+
+  <h2>5. Data Retention</h2>
+  <ul>
+    <li>App usage records are stored locally and can be deleted by the user from within the app's Settings screen.</li>
+    <li>Our backend keeps no database of its own. Stripe retains customer and charge records for transaction and refund purposes, per its own retention policy.</li>
+    <li>If you uninstall the app, local data is deleted automatically by Android and no further charges are initiated. Your Stripe customer record and charge history persist until you request their deletion.</li>
+  </ul>
+
+  <h2>6. Children's Privacy</h2>
+  <p>Screen Tax is not intended for use by anyone under the age of 18. We do not knowingly collect information from minors. If you believe a minor has used the App, please contact us at <a href="mailto:admin@invert-able.com">admin@invert-able.com</a>.</p>
+
+  <h2>7. Security</h2>
+  <p>We take reasonable precautions to protect the limited data that transits our backend, including HTTPS encryption for all API communication. However, no method of transmission over the internet is 100% secure.</p>
+
+  <h2>8. Your Rights</h2>
+  <p>Since we hold minimal personal data, your primary controls are within the app itself:</p>
+  <ul>
+    <li>Delete specific days of usage data from Settings → Data.</li>
+    <li>Update or remove your payment card at any time.</li>
+    <li>Contact us with your Customer ID to request deletion of your Stripe customer record, charge history and saved card.</li>
+  </ul>
+
+  <h2>9. Changes to This Policy</h2>
+  <p>We may update this Privacy Policy from time to time. Material changes will be communicated within the App. Continued use after changes take effect constitutes acceptance of the revised policy.</p>
+
+  <h2>10. Contact</h2>
+  <p>Questions or concerns? Reach us at <a href="mailto:admin@invert-able.com">admin@invert-able.com</a>.</p>
+
+</main>
+
+<footer>
+  &copy; 2026 Invert LLC &mdash; Screen Tax. All rights reserved.
+</footer>
+
+</body>
+</html>

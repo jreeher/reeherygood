@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Screen Tax — Terms of Service</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f9f9f9;
+      color: #1a1a1a;
+      line-height: 1.7;
+    }
+    header {
+      background: #005F57;
+      color: #fff;
+      padding: 40px 24px 32px;
+      text-align: center;
+    }
+    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; }
+    header p  { color: rgba(255,255,255,0.75); margin-top: 6px; font-size: 0.95rem; }
+    .gold { color: #FFB800; }
+    main {
+      max-width: 720px;
+      margin: 40px auto;
+      padding: 0 24px 60px;
+    }
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #005F57;
+      margin: 36px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+    p { margin-bottom: 14px; }
+    ul { margin: 10px 0 14px 24px; }
+    li { margin-bottom: 8px; }
+    .callout {
+      background: #fff8e1;
+      border-left: 4px solid #FFB800;
+      padding: 14px 18px;
+      margin: 20px 0;
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+    a { color: #005F57; }
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 0.85rem;
+      color: #888;
+      border-top: 1px solid #e0e0e0;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1><span class="gold">Screen</span> Tax</h1>
+  <p>Terms of Service</p>
+</header>
+
+<main>
+
+  <p><strong>Last updated: October 2026</strong></p>
+
+  <p>These Terms of Service ("Terms") govern your use of the Screen Tax mobile application ("App"), which is operated by Invert LLC ("Invert LLC," "we," "us," or "our"). Please read them carefully before using the App. By downloading, installing, or using the App, you agree to be bound by these Terms. If you do not agree, do not use the App.</p>
+
+  <h2>1. Overview</h2>
+  <p>Screen Tax is a financial accountability tool that tracks the time you spend on selected apps and automatically charges your credit card on a monthly basis. Charges are paid to Invert LLC (see Section 5). The App is designed to create financial incentives for reducing screen time.</p>
+
+  <h2>2. Eligibility</h2>
+  <ul>
+    <li>You must be at least 18 years old to use Screen Tax.</li>
+    <li>You must reside in the United States.</li>
+    <li>You must have a valid credit or debit card capable of being charged in USD.</li>
+    <li>By using the App, you represent that you meet these requirements.</li>
+  </ul>
+
+  <h2>3. How Charges Work</h2>
+  <p>Screen Tax tracks foreground usage of apps you select and applies a per-hour rate that you configure. Each app may have a free daily allowance (in minutes) before charges begin. The charge formula is:</p>
+  <ul>
+    <li><strong>Billable minutes</strong> = Total usage minutes − Free allowance minutes (minimum 0)</li>
+    <li><strong>Charge</strong> = (Billable minutes ÷ 60) × Hourly rate</li>
+  </ul>
+  <p>Charges accumulate over each calendar month. The completed month's total is processed automatically on the <strong>1st at approximately 6:00 AM</strong> local time. If the App cannot run then, the charge is attempted the next time you open it, still for the same month. Charges below the payment processor's minimum transaction amount of <strong>$0.50</strong> are skipped for that month and are not carried forward.</p>
+  <p>Your monthly charge is capped at <strong>$25.00</strong> regardless of usage, as a safety limit against misconfiguration or inaccurate usage data.</p>
+
+  <div class="callout">
+    <strong>Uninstalling the App:</strong> Charges are initiated by the App on your device. If you uninstall Screen Tax before a month's charge has been processed, that charge will not be collected, and all locally stored data is removed by Android. Charges already processed before uninstalling are not automatically reversed; see Section 6 for refunds.
+  </div>
+
+  <h2>4. Payment and Card Storage</h2>
+  <p>All payment processing is handled by <strong>Stripe</strong>, a third-party payment processor. Screen Tax does not store your full card number, CVV, or billing address. The App retains only your Stripe Customer ID, the last four digits of your card, and your card brand for display purposes.</p>
+  <p>By providing your payment information, you authorize Screen Tax to charge your card on the monthly schedule described above for as long as the App is installed and active, or until you revoke authorization by contacting support.</p>
+  <p>If a charge fails, the App retries it automatically once a day, up to five more times. If every attempt fails, the charge is marked as failed and no further automatic attempts are made; you can still retry it manually from the App's Settings.</p>
+  <p>Screen Tax has no user accounts. Your payment method is linked to this installation of the App; if you reinstall, you will need to add your card again. See our <a href="screentax-privacy.html">Privacy Policy</a> for what information is handled.</p>
+
+  <h2>5. Where Your Money Goes</h2>
+  <p>Charges are paid to Invert LLC, which keeps them. They are the fee you agree to pay for going over the limits you set. Stripe's payment processing fees are paid by Invert LLC and are never added to your charge.</p>
+  <p>Charges are <strong>not donations</strong>. No part of a charge is passed on to a charity or any other organization, and charges are not tax-deductible.</p>
+
+  <h2>6. Refunds</h2>
+  <p>All charges are eligible for a full refund upon request within <strong>7 days</strong> of the original charge date. To request a refund, email <a href="mailto:admin@invert-able.com">admin@invert-able.com</a> from the address associated with your account. Refund requests submitted after the 7-day window may be considered at Invert LLC's discretion.</p>
+
+  <h2>7. App Permissions</h2>
+  <p>Screen Tax requires the <strong>Usage Access</strong> permission (PACKAGE_USAGE_STATS) to function. This permission must be granted manually by the user in Android Settings. This data is used solely to calculate charges within the App and is not transmitted to any external server.</p>
+
+  <h2>8. Prohibited Uses</h2>
+  <p>You agree not to:</p>
+  <ul>
+    <li>Attempt to circumvent charges through technical manipulation of the App or its data.</li>
+    <li>Use the App for any unlawful purpose.</li>
+    <li>Reverse engineer, decompile, or modify the App.</li>
+  </ul>
+
+  <h2>9. Disclaimer of Warranties</h2>
+  <p>Screen Tax is provided "as is" without warranties of any kind, express or implied. We do not guarantee that the App will be error-free, uninterrupted, or that usage tracking will be 100% accurate in all circumstances. We are not responsible for charges that result from inaccurate usage data reported by the Android operating system.</p>
+
+  <h2>10. Limitation of Liability</h2>
+  <p>To the fullest extent permitted by applicable law, Invert LLC, the operator of Screen Tax, shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the App. Our total liability to you for any claim shall not exceed the amount charged to your card in the month to which the claim relates, and in no event more than $25.00.</p>
+
+  <h2>11. Changes to These Terms</h2>
+  <p>We may update these Terms from time to time. If we make material changes, we will notify you within the App. Continued use of Screen Tax after changes take effect constitutes acceptance of the revised Terms.</p>
+
+  <h2>12. Governing Law</h2>
+  <p>These Terms are governed by the laws of the State of Oregon, without regard to conflict of law principles.</p>
+
+  <h2>13. Contact</h2>
+  <p>Questions about these Terms? Contact us at <a href="mailto:admin@invert-able.com">admin@invert-able.com</a>.</p>
+
+</main>
+
+<footer>
+  &copy; 2026 Invert LLC &mdash; Screen Tax. All rights reserved.
+</footer>
+
+</body>
+</html>
