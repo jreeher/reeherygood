@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Screen Tax &mdash; An Android app that charges you for wasted screen time</title>
-  <meta name="description" content="Screen Tax is a free Android app that charges you for time on your most distracting apps, then donates what's left to a cause you choose. Billed monthly, capped at $25.">
+  <meta name="description" content="Screen Tax is a free Android app that charges you for time on your most distracting apps, once a month. Billed monthly, capped at $25.">
   <link rel="canonical" href="https://invert-able.com/screentax.html">
   <link rel="stylesheet" href="style.css">
   <link rel="icon" href="njoy-favicon.png">
@@ -176,7 +176,7 @@
       <img src="screentax-icon.png" alt="Screen Tax app icon" class="st-hero-icon">
       <h1>Screen Tax</h1>
       <p>Screen time was never free &mdash; but now it actually hurts.</p>
-      <p class="st-lede">A free Android app that charges you for time on your most distracting apps, then donates what&rsquo;s left to a cause you choose.</p>
+      <p class="st-lede">A free Android app that charges you for time on your most distracting apps, once a month, with a hard cap of $25.</p>
       <div class="st-hero-cta hero-cta">
         <a href="https://drive.google.com/drive/folders/1tyuXOZUxpHife_8fUaZm9tb2VKq1mLMi?usp=sharing"
            class="btn btn-yellow" target="_blank" rel="noopener noreferrer">Download for Android</a>
@@ -194,8 +194,8 @@
           The extra time is added to your tab, and once a month your card is charged for it.
         </p>
         <p>
-          You set every rule yourself, so the &ldquo;tax&rdquo; is entirely in your control. After payment-processing
-          and service fees, the money is donated to a cause you pick during setup.
+          You set every rule yourself, so the &ldquo;tax&rdquo; is entirely in your control. The money you pay
+          goes to Invert LLC, the company that makes Screen Tax. It is not donated to charity.
         </p>
 
         <div class="st-grid">
@@ -216,8 +216,8 @@
           </div>
           <div class="st-card">
             <div class="st-num">4</div>
-            <h3>It gets donated</h3>
-            <p>What remains after fees goes to the charity you chose: hunger relief, PETA, or the NRA Foundation.</p>
+            <h3>Stay in control</h3>
+            <p>Your monthly charge is capped at $25, and you can change your apps, allowances and rates at any time.</p>
           </div>
         </div>
       </div>
@@ -264,37 +264,17 @@
     </section>
 
     <!-- ===== WHERE THE MONEY GOES ===== -->
-    <section class="st-section" id="donations">
+    <section class="st-section" id="money">
       <div class="st-wrap">
         <h2>Where the money goes</h2>
         <p>
-          During setup you choose one destination for your donations: a hunger-relief charity fund, PETA, or the NRA Foundation.
-          You can change it at any time in Settings. Charges are collected and donated in aggregate to the organization you chose.
+          Charges are paid to Invert LLC, the operator of Screen Tax, which keeps them. They are the fee you agree
+          to pay for going over the limits you set. Payments are processed by Stripe, and Stripe&rsquo;s processing
+          fees are paid by Invert LLC &mdash; they are never added to your charge.
         </p>
-        <p>Before anything is donated, two fees are deducted from each charge:</p>
-        <ul class="st-list">
-          <li><strong>Payment processing fee:</strong> about 2.9% + $0.30 per transaction, charged by our payment processor, Stripe.</li>
-          <li><strong>Platform service fee:</strong> 10% of the charge, kept by Invert LLC to cover infrastructure, maintenance and operating costs.</li>
-        </ul>
-
-        <div class="st-table-scroll">
-          <table class="st-table">
-            <caption style="text-align:left; font-weight:700; padding-bottom:0.6rem;">Example: a $5.00 monthly charge</caption>
-            <thead>
-              <tr><th scope="col">Item</th><th scope="col">Amount</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>Amount charged</td><td>$5.00</td></tr>
-              <tr><td>Payment processing fee (about 2.9% + $0.30)</td><td>&minus; $0.45</td></tr>
-              <tr><td>Platform service fee (10%)</td><td>&minus; $0.50</td></tr>
-              <tr><td>Donated to your chosen cause</td><td>about $4.05</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <p style="margin-top:1.4rem;">
-          Donations are made by Screen Tax in aggregate, not by you individually, so they are not tax-deductible to you and you won&rsquo;t receive a donation receipt.
-          We don&rsquo;t guarantee a specific disbursement date.
+        <p>
+          Charges are <strong>not donations</strong>. No part of a charge is passed on to a charity or any other
+          organization, and charges are not tax-deductible.
         </p>
       </div>
     </section>
@@ -305,7 +285,7 @@
         <h2>Refunds</h2>
         <p>
           Every charge is eligible for a <strong>full refund if you ask within 7 days</strong> of the charge date.
-          Email <a href="mailto:jordanr@invert-able.com">jordanr@invert-able.com</a> from the address on your Screen Tax account.
+          Email <a href="mailto:admin@invert-able.com">admin@invert-able.com</a> and include your Stripe customer ID (shown in Settings).
           Requests after 7 days may still be considered at Invert LLC&rsquo;s discretion.
         </p>
       </div>
@@ -318,14 +298,14 @@
         <p class="st-sub">Your per-app screen time never leaves your phone.</p>
         <ul class="st-list">
           <li><strong>Stays on your device:</strong> the minutes you spend in each app, and your charge history.</li>
-          <li><strong>Your account:</strong> Screen Tax uses an email address and password to link your saved payment method across the app and web dashboard, and to restore it if you reinstall.</li>
-          <li><strong>What our server holds:</strong> your account, your per-app settings (so they can be restored), payment identifiers, the dollar amount of a month at the moment it is charged, your donation choice, and a notification token for your device.</li>
+          <li><strong>No accounts:</strong> Screen Tax has no email or password. Your saved payment method is tied to the app on your phone, so if you reinstall you add your card again.</li>
+          <li><strong>What our server sees:</strong> a token naming your Stripe customer and the dollar amount of a month at the moment it is charged. It keeps no database of its own.</li>
           <li><strong>Your card:</strong> card details are collected and stored by Stripe. Screen Tax keeps only a Stripe customer ID, the last four digits, and the card brand.</li>
-          <li><strong>Google Firebase</strong> is used for push notifications, crash reports and analytics. Crash reports can include a month&rsquo;s charge amount.</li>
+          <li><strong>Google Firebase</strong> is used for crash reports and analytics. Crash reports can include a month&rsquo;s charge amount.</li>
           <li><strong>No ads, no selling:</strong> we don&rsquo;t use advertising networks or cross-app tracking, and we don&rsquo;t sell your data.</li>
         </ul>
         <p>
-          To delete your account and server-side data, email <a href="mailto:jordanr@invert-able.com">jordanr@invert-able.com</a>.
+          To delete your payment customer record and charge history, email <a href="mailto:admin@invert-able.com">admin@invert-able.com</a>.
           Read the full <a href="https://jreeher.github.io/screentax-legal/tos.html">Terms of Service</a> and <a href="https://jreeher.github.io/screentax-legal/privacy.html">Privacy Policy</a>; both are also shown during setup in the app and are always available under Settings.
         </p>
       </div>
@@ -365,7 +345,7 @@
 
         <details class="st-faq">
           <summary>How do I get help?</summary>
-          <p class="st-contact">Email <a href="mailto:jordanr@invert-able.com">jordanr@invert-able.com</a> for support, refund requests, or account deletion.</p>
+          <p class="st-contact">Email <a href="mailto:admin@invert-able.com">admin@invert-able.com</a> for support, refund requests, or data deletion.</p>
         </details>
 
         <p class="st-contact" style="margin-top:2rem;">Screen Tax is operated by Invert LLC. Billing details last updated October 2026.</p>
