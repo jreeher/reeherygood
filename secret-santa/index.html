@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Krampus's Dungeon — Secret Santa</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0d1b2a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#1a1c2c; --paper:#f8f4e6; --red:#c8283c; --green:#2f8f4e; --gold:#f2c14e; }
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { margin:0; height:100%; background:#0d1b2a; color:var(--paper);
+    font-family:'Press Start 2P', ui-monospace, monospace; overflow:hidden; touch-action:manipulation;
+    -webkit-user-select:none; user-select:none; }
+  body { display:flex; justify-content:center; }
+  #app { position:relative; width:100%; max-width:520px; height:100%; display:flex; flex-direction:column; }
+  #screen { position:relative; width:100%; aspect-ratio:10/9; background:#000; border-bottom:4px solid #000; flex:none; overflow:hidden; }
+  canvas#game { width:100%; height:100%; display:block; image-rendering:pixelated; image-rendering:crisp-edges; }
+
+  #hud { position:absolute; left:2%; top:2%; padding:5px 7px; background:rgba(26,28,44,.82); border:2px solid var(--paper);
+    border-radius:4px; font-size:clamp(7px,2.1vw,10px); line-height:1.6; display:none; }
+  #hud .floorname { color:var(--gold); }
+  #mute { position:absolute; right:2%; top:2%; font:inherit; font-size:10px; background:rgba(26,28,44,.82); color:var(--paper);
+    border:2px solid var(--paper); border-radius:4px; padding:5px 6px; cursor:pointer; display:none; }
+
+  .battlebox { position:absolute; background:var(--paper); color:var(--ink); border:3px solid var(--ink); border-radius:6px;
+    padding:5px 7px; font-size:clamp(7px,2.1vw,10px); display:none; box-shadow:3px 3px 0 rgba(0,0,0,.35); }
+  #enemyBox { left:3%; top:4%; width:52%; }
+  #heroBox { right:3%; top:47%; width:50%; }
+  .bar { height:7px; background:#444; border:2px solid var(--ink); border-radius:3px; margin-top:5px; overflow:hidden; }
+  .bar > i { display:block; height:100%; width:100%; background:#3fbf5a; transition:width .45s, background .45s; }
+  .hpnum { text-align:right; margin-top:4px; font-size:.9em; }
+  .status { color:#2b6fd6; font-size:.8em; }
+
+  #textbox { position:absolute; left:2%; right:2%; bottom:2.5%; height:28%; background:var(--paper); color:var(--ink);
+    border:4px double var(--ink); border-radius:6px; padding:8px 10px; font-size:clamp(8px,2.5vw,12px); line-height:1.75;
+    display:none; cursor:pointer; box-shadow:0 0 0 2px var(--paper); }
+  #textbox.show { display:block; }
+  #more { position:absolute; right:8px; bottom:4px; animation:blink .8s steps(2) infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+
+  #menu { position:absolute; left:2%; right:2%; bottom:2.5%; height:28%; display:none; grid-template-columns:1fr 1fr; gap:4px;
+    background:var(--paper); border:4px double var(--ink); border-radius:6px; padding:5px; box-shadow:0 0 0 2px var(--paper); }
+  #menu.show { display:grid; }
+  #menu button { font:inherit; font-size:clamp(7px,2.2vw,11px); color:var(--ink); background:#fff; border:2px solid var(--ink);
+    border-radius:4px; cursor:pointer; text-align:left; padding:0 8px; }
+  #menu button.sel, #menu button:hover { background:var(--gold); }
+  #menu button:disabled { opacity:.4; cursor:not-allowed; }
+
+  #controls { flex:1; display:flex; align-items:center; justify-content:space-between; padding:10px 26px 18px; min-height:150px;
+    background:linear-gradient(#16263a,#0d1b2a); }
+  .dpad { position:relative; width:138px; height:138px; }
+  .dpad button { position:absolute; width:46px; height:46px; background:#2b2d42; border:none; color:#8d99ae; font-size:14px;
+    border-radius:6px; box-shadow:0 4px 0 #111; }
+  .dpad button:active, .dpad button.on { transform:translateY(3px); box-shadow:0 1px 0 #111; background:#3a3d5c; }
+  .dpad .u { left:46px; top:0; } .dpad .d { left:46px; bottom:0; } .dpad .l { left:0; top:46px; } .dpad .r { right:0; top:46px; }
+  .dpad .c { left:46px; top:46px; background:#2b2d42; pointer-events:none; box-shadow:none; border-radius:0; }
+  .abtn { width:78px; height:78px; border-radius:50%; border:none; background:var(--red); color:#fff; font:inherit; font-size:18px;
+    box-shadow:0 5px 0 #6e0f1d; cursor:pointer; }
+  .abtn:active { transform:translateY(4px); box-shadow:0 1px 0 #6e0f1d; }
+  .hint { position:absolute; bottom:4px; left:0; right:0; text-align:center; font-size:7px; color:#5c6b80; }
+
+  .overlay { position:absolute; inset:0; z-index:20; display:none; overflow-y:auto; background:#0d1b2a; padding:18px 14px 30px; }
+  .overlay.show { display:block; }
+  .snow { position:fixed; inset:0; pointer-events:none; background-image:
+      radial-gradient(2px 2px at 20px 30px,#fff 50%,transparent 51%), radial-gradient(2px 2px at 90px 120px,#fff 50%,transparent 51%),
+      radial-gradient(3px 3px at 160px 60px,#dfefff 50%,transparent 51%), radial-gradient(2px 2px at 220px 170px,#fff 50%,transparent 51%),
+      radial-gradient(2px 2px at 60px 210px,#fff 50%,transparent 51%), radial-gradient(3px 3px at 280px 20px,#fff 50%,transparent 51%);
+    background-size:300px 240px; animation:snow 9s linear infinite; opacity:.55; }
+  @keyframes snow { to { background-position:40px 240px, -30px 240px, 20px 240px, -20px 240px, 30px 240px, -40px 240px; } }
+
+  h1.title { text-align:center; font-size:clamp(15px,5vw,24px); line-height:1.45; margin:6px 0 4px; color:var(--red);
+    text-shadow:3px 3px 0 #000, -1px -1px 0 #fff; }
+  h1.title span { display:block; color:var(--gold); font-size:.62em; margin-top:6px; }
+  .sub { text-align:center; font-size:clamp(7px,2.2vw,10px); line-height:1.9; color:#c9d6e3; margin:10px 4px 16px; }
+  .grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; position:relative; }
+  .card { position:relative; background:#1b2b40; border:3px solid #33506f; border-radius:6px; padding:8px 4px 8px; text-align:center;
+    cursor:pointer; font:inherit; color:var(--paper); }
+  .card:hover:not(:disabled) { border-color:var(--gold); transform:translateY(-2px); }
+  .card canvas { width:64px; height:64px; image-rendering:pixelated; display:block; margin:0 auto 6px; }
+  .card .nm { font-size:clamp(8px,2.4vw,11px); }
+  .card .cl { font-size:6px; color:#9fb3c8; margin-top:6px; line-height:1.6; min-height:20px; }
+  .card:disabled { cursor:not-allowed; filter:grayscale(1); opacity:.55; }
+  .card .lock { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .card .lock b { background:var(--red); color:#fff; font-size:8px; padding:5px 6px; border:2px solid #fff; transform:rotate(-12deg); }
+  .loading { text-align:center; font-size:9px; color:#9fb3c8; margin:30px 0; line-height:2; }
+  .panel { background:#1b2b40; border:3px solid #33506f; border-radius:8px; padding:16px; margin:14px 0; font-size:clamp(7px,2.3vw,10px); line-height:2; }
+  .panel b { color:var(--gold); font-weight:normal; }
+  .big { display:block; width:100%; margin-top:14px; padding:14px; font:inherit; font-size:clamp(9px,2.8vw,12px); color:#fff; background:var(--green);
+    border:3px solid #fff; border-radius:6px; cursor:pointer; box-shadow:0 5px 0 #0c3d1e; }
+  .big:active { transform:translateY(3px); box-shadow:0 2px 0 #0c3d1e; }
+  .big.red { background:var(--red); box-shadow:0 5px 0 #6e0f1d; }
+  .big.ghost { background:transparent; box-shadow:none; border-color:#556b84; color:#9fb3c8; }
+  .hero-row { display:flex; gap:14px; align-items:center; }
+  .hero-row canvas { width:96px; height:96px; image-rendering:pixelated; flex:none; background:#0d1b2a; border:3px solid #33506f; border-radius:6px; }
+
+  #reveal { background:radial-gradient(circle at 50% 40%, #3b1d2e, #0d1b2a 70%); }
+  .scroll { margin:20px auto 0; max-width:380px; background:#f3e3b5; color:#4a2c12; border:4px solid #8a5a2b; border-radius:6px;
+    padding:22px 16px; text-align:center; box-shadow:0 0 0 4px #d8bd7a, 0 10px 30px rgba(0,0,0,.6); font-size:clamp(8px,2.4vw,11px); line-height:2; }
+  .scroll .who { font-size:clamp(20px,8vw,34px); color:var(--red); margin:18px 0 10px; text-shadow:2px 2px 0 #e8c98a; animation:pop .9s ease-out; }
+  @keyframes pop { 0% { transform:scale(.2); opacity:0; } 70% { transform:scale(1.15); opacity:1; } 100% { transform:scale(1); } }
+  .warn { color:var(--red); }
+  .ash { text-align:center; font-size:11px; line-height:2.2; margin-top:60px; }
+</style>
+</head>
+<body>
+<div class="snow"></div>
+<div id="app">
+  <div id="screen">
+    <canvas id="game" width="160" height="144"></canvas>
+    <div id="hud"></div>
+    <button id="mute" type="button" aria-label="Toggle sound">♪ ON</button>
+    <div id="enemyBox" class="battlebox"><div id="eName"></div><div class="bar"><i id="eBar"></i></div><div class="status" id="eStatus"></div></div>
+    <div id="heroBox" class="battlebox"><div id="hName"></div><div class="bar"><i id="hBar"></i></div><div class="hpnum" id="hNum"></div></div>
+    <div id="textbox"><div id="text"></div><div id="more">▼</div></div>
+    <div id="menu"></div>
+  </div>
+  <div id="controls">
+    <div class="dpad">
+      <button class="u" data-dir="up" aria-label="Up">▲</button>
+      <button class="l" data-dir="left" aria-label="Left">◀</button>
+      <div class="c"></div>
+      <button class="r" data-dir="right" aria-label="Right">▶</button>
+      <button class="d" data-dir="down" aria-label="Down">▼</button>
+    </div>
+    <button class="abtn" id="abtn" aria-label="A button">A</button>
+    <div class="hint">Arrows / WASD to move · Enter or Space = A</div>
+  </div>
+
+  <div id="title" class="overlay show">
+    <h1 class="title">KRAMPUS'S DUNGEON<span>~ Secret Santa Edition ~</span></h1>
+    <p class="sub">Krampus stole Santa's list of Secret Santa names!<br>Pick your hero, fight down 3 floors, and defeat him to find out who you're shopping for.</p>
+    <div id="cards"><div class="loading">Checking the naughty list...</div></div>
+  </div>
+  <div id="confirm" class="overlay"></div>
+  <div id="reveal" class="overlay"></div>
+</div>
+
+<script>
+'use strict';
+/* =====================================================================
+   SETTINGS
+   LOCK_API: leave '' to lock reveals on each device only.
+   To lock for EVERYONE (recommended), deploy ./server to Railway and
+   paste its URL here, e.g. 'https://secret-santa-production.up.railway.app'
+   ===================================================================== */
+const LOCK_API = '';
+
+/* ---------- The draw (scrambled so nobody spoils it by peeking) ---------- */
+const PAIRS = "jP2fRJ8cO2k=";
+const PKEY = [135,214,212,32,27,181,255,139];
+function gifteeOf(i){
+  const raw = atob(PAIRS).charCodeAt(i) ^ PKEY[i];
+  return ((raw - 31*i - 7) % 251 + 251) % 251;
+}
+
+/* ---------- Palette ---------- */
+const PAL = { K:'#1a1c2c', D:'#33343d', Y:'#f2c14e', T:'#e8b98a', E:'#111111', W:'#f4f4f4', R:'#d63a3a', r:'#8e1f2a',
+  G:'#3fa34d', g:'#a7b0ba', b:'#3b5bd6', L:'#bfe6ff', N:'#9a6234', n:'#5e3a1c', O:'#ff8a1f', X:'#ff8fb1', V:'#8a4fd1', m:'#a8323c', B:'#4a2c1a' };
+
+/* ---------- Heroes ---------- */
+const HERO_BASE = [
+"................",
+".....KKKKKK.....",
+"....KHHHHHHK....",
+"...KHHHHHHHHK...",
+"...KHSSSSSSHK...",
+"...KSSESSESSK...",
+"...KSSSSSSSSK...",
+"....KSSmmSSK....",
+".....KAAAAK.....",
+"...KKCCAACCKK...",
+"..KSKCCCCCCKSK..",
+"..KSKCCCCCCKSK..",
+"...KKCCCCCCKK...",
+"....KPPKKPPK....",
+"....KBBKKBBK....",
+"....KKK..KKK....",
+];
+const LONG_HAIR = { 5:"..KHSSESSESSHK..", 6:"..KHSSSSSSSSHK..", 7:"..KHKSSmmSSKHK..", 8:"..KHHKAAAAKHHK.." };
+const STYLES = {
+  helmet:  { 0:"......KRRK......", 1:"....KKggggKK....", 2:"...KggWgggggK...", 3:"...KggggggggK..." },
+  wizard:  Object.assign({ 0:".......KK.......", 1:"......KbbK......", 2:".....KbbYbK.....", 3:"..KKKbbbbbbKKK..", 4:"..KbbbbbbbbbbK.." }, LONG_HAIR),
+  goggles: { 0:".....K..K..K....", 1:"....KHKKHKKHK...", 3:"...KYLLYYLLYK..." },
+  flowers: Object.assign({ 1:".....KVGGVK.....", 2:"....KVHHHHVK...." }, LONG_HAIR),
+  lumber:  { 1:".....KKKKKK.....", 2:"....KRrRrRrK....", 3:"...KRrRrRrRrK...", 4:"..KKKKKKKKKKKK..", 6:"...KHSSSSSSHK...", 7:"...KHHHmmHHHK...", 8:"....KHHHHHHK...." },
+  chef:    Object.assign({ 0:".....KKKKKK.....", 1:"....KWWWWWWK....", 2:"....KWWWWWWK....", 3:"...KHWWWWWWHK..." }, LONG_HAIR),
+  antlers: Object.assign({}, LONG_HAIR, { 0:"..KNK......KNK..", 1:"...KNKKKKKKNK...", 2:"...KNHHHHHHNK...", 6:"..KHSSSRRSSSHK.." }),
+  muffs:   { 3:"...KRRRRRRRRK...", 4:"..KRHSSSSSSHRK..", 5:"..KRSSESSESSRK..", 9:"...KKCCAACCKK...", 10:"..KAKCWCCWCKAK..", 11:"..KSKAAAAAAKSK.." },
+};
+const PLAYERS = [
+  { name:'David',   cls:'Knight of the North Pole', style:'helmet',  c:{H:'#6b4423',C:'#8f9fae',A:'#c9302c',P:'#3b3b58'},
+    hp:62, atk:10, def:6, spd:4, sp:3, atkName:'Sword Swipe', spName:'Candy Cane Cleave', spDesc:'A mighty double-damage slash.' },
+  { name:'Juli',    cls:'Snow Mage', style:'wizard',  c:{H:'#6e4426',C:'#4a5fd6',A:'#f2c14e',P:'#2c2f6b'},
+    hp:46, atk:12, def:3, spd:8, sp:4, atkName:'Frost Bolt', spName:'Blizzard Burst', spDesc:'Big ice blast. Often freezes the foe solid for a turn.' },
+  { name:'Jordan',  cls:'Toy Tinkerer', style:'goggles', c:{H:'#6b4423',C:'#e07a2e',A:'#3a6fb0',P:'#2f4a7a'},
+    hp:52, atk:11, def:4, spd:7, sp:3, atkName:'Wrench Whack', spName:'Wind-Up Robot Army', spDesc:'Three tiny robots attack in a row.' },
+  { name:'Erin',    cls:'Sugarplum Healer', style:'flowers', c:{H:'#ecc86a',C:'#e889b4',A:'#ffffff',P:'#8a3d6b'},
+    hp:54, atk:9, def:5, spd:6, sp:4, atkName:'Holly Thorns', spName:'Sugarplum Song', spDesc:'Heals you a lot and stings the foe.' },
+  { name:'Dick',    cls:'Yule Log Lumberjack', style:'lumber',  c:{H:'#a9a9ae',C:'#c8283c',A:'#1a1c2c',P:'#3d4a5c'},
+    hp:68, atk:12, def:5, spd:3, sp:3, atkName:'Axe Chop', spName:'Yule Log Slam', spDesc:'A huge, slow, crushing log smash.' },
+  { name:'Dawn',    cls:'Cookie Alchemist', style:'chef',    c:{H:'#1c1818',C:'#3f8f6a',A:'#ffffff',P:'#5a3a2a'},
+    hp:56, atk:10, def:4, spd:6, sp:3, atkName:'Rolling Pin', spName:'Fresh-Baked Barrage', spDesc:'Hot cookies hit hard and heal you, too.' },
+  { name:'Chelsea', cls:'Reindeer Ranger', style:'antlers', c:{H:'#6e4426',C:'#6b8f3a',A:'#c8283c',P:'#4a3a22'},
+    hp:48, atk:11, def:3, spd:10, sp:3, atkName:'Arrow Shot', spName:'Sleigh-Bell Volley', spDesc:'Two quick arrows that love critical hits. Very dodgy.' },
+  { name:'Jake',    cls:'Snowball Linebacker', style:'muffs',   c:{H:'#6b4423',C:'#0b1c3a',A:'#e8691f',P:'#d8d8d8',R:'#e8691f'},
+    hp:52, atk:11, def:4, spd:8, sp:3, atkName:'Snowball', spName:'Snowball Avalanche', spDesc:'Ignores armor and weakens the foe for good.' },
+];
+function heroGrid(p){
+  const g = HERO_BASE.slice(); const st = STYLES[p.style];
+  for (const k in st) g[k] = st[k];
+  return g;
+}
+function heroPal(p){ return Object.assign({}, PAL, Object.assign({ S:'#f2c9a0', B:'#4a2c1a' }, p.c)); }
+
+/* ---------- Monsters ---------- */
+const SPR = {
+  nut: [
+".....KKKKKK.....",".....KDDDDK.....",".....KDDDDK.....",".....KDYYDK.....","....KKKKKKKK....",".....KTTTTK.....",
+".....KETTEK.....",".....KWWWWK.....",".....KWKKWK.....","....KRRYYRRK....","...KRRRYYRRRK...","...KTKRYYRKTK...",
+"....KKbbbbKK....",".....KbKKbK.....",".....KDKKDK.....",".....KKKKKK....."],
+  bat: [
+"................","................","K..............K","KgK....KK....KgK","KggK..KVVK..KggK","KgLgKKVVVVKKgLgK",
+"KgggVVWVVWVVgggK",".KgLVVEVVEVVLgK.",".KggVVVVVVVVggK.","..KgKVVWWVVKgK..","..KK.KVVVVK.KK..","......KVVK......",
+".......KK.......","................","................","................"],
+  gum: [
+"................","................","................","................","......KKKK......",".....KGGWGK.....",
+"....KGGGGWGK....","...KGWGGGGGGK...","...KGGEGGEGGK...","..KGGGGGGGGGGK..","..KGGGKKKKGGGK..","..KGWGGGGGGWGK..",
+".KGGGGGGGGGGGGK.",".KGGGGWGGGGGGGK.","..KKKKKKKKKKKK..","................"],
+  ginger: [
+"................",".....KKKKKK.....","....KNNNNNNK....","...KNNNNNNNNK...","...KNWENNEWNK...","...KNNNNNNNNK...",
+"...KNWNNNNWNK...","....KNWWWWNK....",".KKKKNNNNNNKKKK.","KNNWNNNRNNNNWNNK","KNNWNNNNNNNNWNNK",".KKKKNNRNNNKKKK.",
+"....KNNNNNNK....","...KNNNKKNNNK...","...KNWNKKNWNK...","...KKKKK.KKKK..."],
+  snowman: [
+".....KKKKKK.....",".....KDDDDK.....",".....KDDDDK.....","....KKKKKKKK....",".....KWWWWK.....","....KWEWWEWK....",
+"....KWWOOWWK....","....KWDWWDWK....",".....KRRRRK.....","...KKWRWWWWKK...","N.KWWWWDWWWWWK.N",".NKWWWWWWWWWWKN.",
+"..KWWWWDWWWWWK..","..KWWWWWWWWWWK..","...KWWWWWWWWK...","....KKKKKKKK...."],
+  coal: [
+"................","................","................","......KKKK......","....KKDDDDKK....","...KDDODDDDDK...",
+"..KDDYDDDDYDDK..","..KDDDDDODDDDK..","..KDODDDDDDDDK..","..KDDDKOOKDDDK..","...KDDDDDDDOK...","..KDKDDODDDKDK..",
+"..KK.KDDDDK.KK..",".....KDKKDK.....",".....KKK.KKK....","................"],
+  fruitcake: [
+"................","................","..KKKKKKKKKKKK..",".KWWWWWWWWWWWWK.",".KWWRWWWWGWWWWK.",".KNNNNNNNNNNNNK.",
+".KNRNNEnNNEnNGK.",".KNNNNNNNNNNNNK.",".KNGNNKKKKNNRNK.",".KNNNKrrrrKNNNK.",".KNNRNKKKKNNNNK.",".KNNNNNNNGNNNNK.",
+".KNnNRNNNNNNnNK.",".KNNNNNNNNNNNNK.","..KKKKKKKKKKKK..","................"],
+  krampus: [
+".KK..........KK.","KNnK........KnNK","KNnK........KnNK",".KNnK.KKKK.KnNK.","..KNnKDDDDKnNK..","...KKDDDDDDKK...",
+"...KDYEDDEYDK...","...KDDDDDDDDK...","...KDWKKKKWDK...","....KDKRRKDK....","..KKDDDKRKDDKK..",".KDDDDDDDDDDDDK.",
+"KgKDDDgggDDDKgK.","KgKDDDDDDDDDKgK.",".K.KDDKKKKDDK.K.","...KKKK..KKKK..."],
+  elf: [
+"........KY......",".......KGK......","......KGGK......",".....KGGGGK.....","....KKKKKKKK....","...TKTTTTTTKT...",
+"....KTETTETK....","....KTTTTTTK....",".....KTRRTK.....","....KGGGGGGK....","...KTKGYYGKTK...","....KGGGGGGK....",
+".....KRKKRK.....",".....KRKKRK.....","....KKK..KKK....","................"],
+};
+const MON = {
+  nut:      { name:'Nutcracker Grunt', spr:'nut', hp:20, atk:8, def:3, atkName:'Jaw Chomp' },
+  bat:      { name:'Tinsel Bat', spr:'bat', hp:15, atk:7, def:1, atkName:'Glitter Bite' },
+  general:  { name:'General Nutcracker', spr:'nut', swap:{R:'#5b2bb0',D:'#1f2a6e',b:'#f2c14e'}, hp:58, atk:10, def:4, boss:true,
+              atkName:'Saber Swing', bigName:'Walnut Cannon', bigMult:1.6, every:3,
+              intro:['"HALT! None shall pass the Workshop!"','General Nutcracker blocks the stairs!'] },
+  gum:      { name:'Gumdrop Slime', spr:'gum', hp:26, atk:9, def:3, atkName:'Sticky Splat' },
+  ginger:   { name:'Gingerbread Brute', spr:'ginger', hp:32, atk:11, def:4, atkName:'Icing Punch' },
+  cake:     { name:'Fruitcake Colossus', spr:'fruitcake', hp:85, atk:12, def:6, boss:true,
+              atkName:'Body Slam', bigName:'Candied Fruit Bomb', bigMult:1.6, every:3,
+              intro:['The ground trembles...','A fruitcake nobody ate in 40 years rises up!','"NOBODY... WANTS... ME!"'] },
+  snowman:  { name:'Wicked Snowman', spr:'snowman', hp:36, atk:12, def:5, atkName:'Icy Glare' },
+  coal:     { name:'Coal Goblin', spr:'coal', hp:30, atk:14, def:3, atkName:'Ember Scratch' },
+  krampus:  { name:'KRAMPUS', spr:'krampus', hp:120, atk:14, def:6, boss:true, final:true,
+              atkName:'Chain Lash', bigName:'Coal Storm', bigMult:1.8, every:3,
+              intro:['The air goes cold. Chains rattle.','"So... you want Santa\'s list?"','"You\'ll have to take it from me!"'] },
+};
+
+/* ---------- Floors ---------- */
+const FLOORS = [
+  { name:'The Frostbitten Toy Workshop', short:'Workshop', theme:'workshop', mons:['nut','bat'], boss:'general',
+    intro:['FLOOR 1: The Frostbitten Toy Workshop','Santa\'s old workshop, abandoned and overrun by toys gone rogue.','A candy-cane gate blocks the way. Somewhere there\'s a key...'],
+    npc:['ELF: Psst! Krampus locked the gate with a Candy-Cane Key.','I saw him stash it in a chest in the north-east room!','Warm up at the fireplace if you get hurt. It saves your spot, too.'],
+    map:[
+"####################",
+"#@.D....#....M...K.#",
+"#.......#.D........#",
+"#..N....#......D...#",
+"#....M..#..M.......#",
+"#.F.....#.....C....#",
+"#D......###.########",
+"#...........#......#",
+"###.#########..M...#",
+"#D....D.....L......#",
+"#..M......M.#.D....#",
+"#.....C.....#...B..#",
+"#..D........#...S..#",
+"####################"] },
+  { name:'The Gingerbread Caverns', short:'Caverns', theme:'caverns', mons:['gum','ginger'], boss:'cake',
+    intro:['FLOOR 2: The Gingerbread Caverns','Rivers of bubbling hot molasses wind through sweet-smelling caves.','Cross on the peppermint bridges. Do NOT fall in!'],
+    npc:['GINGERBREAD KID: You came to stop Krampus?! Whoa.','The Fruitcake Colossus guards the stairs. It is SO dense.','Cocoa helps. There\'s some in a chest across the river.'],
+    map:[
+"####################",
+"#@...D....~....M..C#",
+"#.........~........#",
+"#..M..N...=....D...#",
+"#.........~........#",
+"#D..F.....~...M....#",
+"#~~=~~~~~~~~~~~~=~~#",
+"#.....D...~........#",
+"#..M......~....M...#",
+"#.........=........#",
+"#....C....~..D.....#",
+"#..D......~....B...#",
+"#.....M...~....S...#",
+"####################"] },
+  { name:'Krampus\'s Frozen Throne', short:'Throne', theme:'ice', mons:['snowman','coal'], boss:'krampus',
+    intro:['FLOOR 3: Krampus\'s Frozen Throne','A palace of black ice, lit by coal fires that burn blue.','The ice is slick: once you slide, you won\'t stop until you hit something!'],
+    npc:['FROZEN ELF: B-b-brr... Krampus is past the ice field.','Slide carefully. Rocks and crystals will stop you.','The throne room door is on the bottom row...'],
+    map:[
+"####################",
+"#@...D....#.....C..#",
+"#..N......#..M.....#",
+"#....M.........D...#",
+"#.F.......#....M...#",
+"####.#########.#####",
+"#__________________#",
+"#__D_____D_____D___#",
+"#________D_________#",
+"#_D_____________D__#",
+"#__________D_______#",
+"##########.#########",
+"#..D......B......D.#",
+"#F........S........#",
+"####################"] },
+];
+
+/* ---------- Canvas + sprites ---------- */
+const cv = document.getElementById('game'); const ctx = cv.getContext('2d'); ctx.imageSmoothingEnabled = false;
+const VW = 160, VH = 144, TS = 16;
+function makeSprite(grid, pal){
+  const c = document.createElement('canvas'); c.width = 16; c.height = 16; const x = c.getContext('2d');
+  grid.forEach((row, y) => { for (let i = 0; i < 16; i++){ const ch = row[i] || '.'; if (ch === '.' || !pal[ch]) continue; x.fillStyle = pal[ch]; x.fillRect(i, y, 1, 1); } });
+  return c;
+}
+function flipped(src){ const c = document.createElement('canvas'); c.width = 16; c.height = 16; const x = c.getContext('2d'); x.scale(-1,1); x.drawImage(src,-16,0); return c; }
+const heroSprites = PLAYERS.map(p => { const s = makeSprite(heroGrid(p), heroPal(p)); return { r:s, l:flipped(s) }; });
+const monSprites = {}; for (const k in MON){ const m = MON[k]; monSprites[k] = makeSprite(SPR[m.spr], Object.assign({}, PAL, m.swap || {})); }
+const npcSprites = [ makeSprite(SPR.elf, PAL), makeSprite(SPR.elf, Object.assign({}, PAL, {G:'#9a6234',T:'#c98a4b',R:'#f4f4f4',Y:'#ff8fb1'})),
+  makeSprite(SPR.elf, Object.assign({}, PAL, {G:'#7fb8e0',T:'#d6ecff',R:'#5a8fc0'})) ];
+
+/* ---------- Audio ---------- */
+const Snd = {
+  ctx:null, muted:false,
+  unlock(){ if (!this.ctx){ try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} } if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume(); },
+  tone(f, d, type='square', v=.04, when=0){
+    if (this.muted || !this.ctx) return; const t = this.ctx.currentTime + when;
+    const o = this.ctx.createOscillator(), g = this.ctx.createGain(); o.type = type; o.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t + d + .02);
+  },
+  seq(notes, step=.14, type='square'){ notes.forEach((n,i) => n && this.tone(n, step*.9, type, .045, i*step)); },
+  blip(){ this.tone(880,.05); }, bump(){ this.tone(120,.08,'square',.05); },
+  hit(){ this.tone(180,.12,'sawtooth',.06); this.tone(90,.15,'square',.05,.04); },
+  heal(){ this.seq([523,659,784,1047],.08,'triangle'); },
+  win(){ this.seq([523,659,784,659,784,1047],.11); },
+  lose(){ this.seq([392,330,262,196],.2,'triangle'); },
+  stairs(){ this.seq([784,659,523,392],.09,'triangle'); },
+  jingle(){ const E=659,G=784,C=523,D=587; this.seq([E,E,E,0,E,E,E,0,E,G,C,D,E],.17,'triangle'); },
+};
+const muteBtn = document.getElementById('mute');
+muteBtn.onclick = () => { Snd.unlock(); Snd.muted = !Snd.muted; muteBtn.textContent = Snd.muted ? '♪ OFF' : '♪ ON'; };
+
+/* ---------- Text + menus ---------- */
+const textbox = document.getElementById('textbox'), textEl = document.getElementById('text'), moreEl = document.getElementById('more');
+const menuEl = document.getElementById('menu');
+let advance = null, menuState = null;
+function say(text, keep=false){
+  return new Promise(resolve => {
+    textbox.classList.add('show'); moreEl.style.visibility = 'hidden';
+    let i = 0; textEl.textContent = '';
+    const done = () => { clearInterval(iv); textEl.textContent = text; moreEl.style.visibility = 'visible';
+      advance = () => { Snd.blip(); if (!keep) textbox.classList.remove('show'); resolve(); }; };
+    const iv = setInterval(() => { i += 1; textEl.textContent = text.slice(0, i); if (i >= text.length) done(); }, 22);
+    advance = done;
+  });
+}
+async function sayAll(lines, keep=false){ for (const l of lines) await say(l, keep); }
+function choose(options){ // options: [{label, disabled}]
+  return new Promise(resolve => {
+    textbox.classList.remove('show'); menuEl.innerHTML = ''; menuEl.classList.add('show');
+    const btns = options.map((o, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = o.label; b.disabled = !!o.disabled;
+      b.onclick = () => pick(i); menuEl.appendChild(b); return b;
+    });
+    let sel = options.findIndex(o => !o.disabled);
+    const paint = () => btns.forEach((b, i) => b.classList.toggle('sel', i === sel));
+    const pick = i => { if (options[i].disabled) return; Snd.blip(); menuEl.classList.remove('show'); menuState = null; resolve(i); };
+    menuState = { move(dx, dy){ let n = sel + dx + dy*2; if (n >= 0 && n < btns.length && !options[n].disabled){ sel = n; paint(); Snd.tone(660,.03); } },
+                  pick(){ pick(sel); }, num(n){ if (n < btns.length) pick(n); } };
+    paint();
+  });
+}
+
+/* ---------- Input ---------- */
+const held = { up:false, down:false, left:false, right:false };
+let needRelease = false;
+const KEYMAP = { ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right', w:'up', s:'down', a:'left', d:'right', W:'up', S:'down', A:'left', D:'right' };
+function pressA(){ Snd.unlock(); if (menuState){ menuState.pick(); return; } if (advance){ const f = advance; advance = null; f(); } }
+function dirPressed(dir){
+  Snd.unlock();
+  if (menuState){ const m = { up:[0,-1], down:[0,1], left:[-1,0], right:[1,0] }[dir]; menuState.move(m[0], m[1]); return; }
+  held[dir] = true;
+}
+addEventListener('keydown', e => {
+  if (document.querySelector('.overlay.show')) return;
+  const dir = KEYMAP[e.key];
+  if (dir){ e.preventDefault(); if (!e.repeat || !menuState) dirPressed(dir); return; }
+  if (e.key === 'Enter' || e.key === ' ' || e.key === 'z' || e.key === 'Z'){ e.preventDefault(); if (!e.repeat) pressA(); }
+  if (menuState && /^[1-4]$/.test(e.key)) menuState.num(+e.key - 1);
+});
+addEventListener('keyup', e => { const dir = KEYMAP[e.key]; if (dir) held[dir] = false; });
+document.querySelectorAll('.dpad button').forEach(b => {
+  const dir = b.dataset.dir;
+  const on = e => { e.preventDefault(); b.classList.add('on'); dirPressed(dir); };
+  const off = e => { e.preventDefault(); b.classList.remove('on'); held[dir] = false; };
+  b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointerleave', off); b.addEventListener('pointercancel', off);
+});
+document.getElementById('abtn').addEventListener('pointerdown', e => { e.preventDefault(); pressA(); });
+textbox.addEventListener('pointerdown', e => { e.preventDefault(); pressA(); });
+addEventListener('blur', () => { for (const k in held) held[k] = false; });
+
+/* ---------- Locks ---------- */
+const LOCAL_KEY = 'krampus-santa-locks-v1';
+const Lock = {
+  local(){ try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]'); } catch(e){ return []; } },
+  async list(){
+    if (!LOCK_API) return this.local();
+    const r = await fetch(LOCK_API.replace(/\/$/,'') + '/locks', { cache:'no-store' });
+    if (!r.ok) throw new Error('bad'); const j = await r.json(); return Array.isArray(j.locked) ? j.locked : [];
+  },
+  async claim(name){ // resolves 'ok' | 'locked'
+    if (!LOCK_API){
+      const l = this.local(); if (l.includes(name)) return 'locked';
+      l.push(name); try { localStorage.setItem(LOCAL_KEY, JSON.stringify(l)); } catch(e){} return 'ok';
+    }
+    const r = await fetch(LOCK_API.replace(/\/$/,'') + '/lock', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ name }) });
+    if (r.status === 409) return 'locked'; if (!r.ok) throw new Error('bad'); return 'ok';
+  },
+};
+
+/* ---------- Game state ---------- */
+let G = null;            // run state
+let mode = 'title';      // title | map | battle
+let busy = false;
+const fx = { shake:0, enemyBlink:0, heroBlink:0, flash:0, enemyGone:false };
+let battle = null;
+
+function newRun(pi){
+  const p = PLAYERS[pi];
+  G = { pi, p, maxHp:p.hp, hp:p.hp, atk:p.atk, def:p.def, spd:p.spd, spMax:p.sp, sp:p.sp, cocoa:2, hasKey:false, spirit:0,
+        floor:0, x:0, y:0, dir:'r', moving:null, slide:null, grid:null, ents:[], bossDown:[false,false,false], cp:null, step:0 };
+}
+function loadFloor(n){
+  G.floor = n; const f = FLOORS[n];
+  G.grid = f.map.map(r => r.split('')); G.ents = []; G.hasKey = n === 0 ? false : G.hasKey;
+  G.grid.forEach((row, y) => row.forEach((c, x) => {
+    if (c === '@'){ G.x = x; G.y = y; row[x] = '.'; }
+    else if (c === 'M'){ G.ents.push({ x, y, type:f.mons[(x*7 + y*3) % f.mons.length], alive:true }); row[x] = '.'; }
+    else if (c === 'B'){ G.ents.push({ x, y, type:f.boss, boss:true, alive:true }); row[x] = '.'; }
+  }));
+  G.cp = { x:G.x, y:G.y }; G.moving = null; G.slide = null;
+}
+const tileAt = (x, y) => (G.grid[y] && G.grid[y][x]) || '#';
+const entAt = (x, y) => G.ents.find(e => e.alive && e.x === x && e.y === y);
+function passable(x, y){
+  const c = tileAt(x, y);
+  if (c === '.' || c === '=' || c === '_') return true;
+  if (c === 'S') return G.bossDown[G.floor];
+  return false;
+}
+function updateHud(){
+  const h = document.getElementById('hud');
+  h.innerHTML = `<span class="floorname">F${G.floor+1} ${FLOORS[G.floor].short}</span><br>♥ ${G.hp}/${G.maxHp} ☕${G.cocoa} ✦${G.sp}${G.hasKey ? ' 🗝' : ''}`;
+}
+function showHud(on){ document.getElementById('hud').style.display = on ? 'block' : 'none'; muteBtn.style.display = on ? 'block' : 'none'; }
+
+/* ---------- Map movement ---------- */
+const DIRS = { up:[0,-1], down:[0,1], left:[-1,0], right:[1,0] };
+function heldDir(){ for (const d of ['up','down','left','right']) if (held[d]) return d; return null; }
+
+function update(){
+  if (mode !== 'map' || !G) return;
+  if (G.moving){
+    const m = G.moving; m.t += m.speed;
+    if (m.t >= 1){
+      G.x = m.tx; G.y = m.ty; G.moving = null; arrived(m.dx, m.dy);
+    }
+    return;
+  }
+  if (busy) return;
+  const d = heldDir();
+  if (!d){ needRelease = false; return; }
+  if (needRelease) return;
+  const [dx, dy] = DIRS[d]; tryStep(dx, dy);
+}
+function startMove(dx, dy, speed){
+  if (dx) G.dir = dx > 0 ? 'r' : 'l';
+  G.moving = { fx:G.x, fy:G.y, tx:G.x + dx, ty:G.y + dy, dx, dy, t:0, speed };
+  G.step++;
+}
+function tryStep(dx, dy){
+  if (dx) G.dir = dx > 0 ? 'r' : 'l';
+  const nx = G.x + dx, ny = G.y + dy;
+  const e = entAt(nx, ny);
+  if (e){ encounter(e); return; }
+  if (passable(nx, ny)){ startMove(dx, dy, tileAt(G.x, G.y) === '_' ? .2 : .125); return; }
+  interact(nx, ny);
+}
+function arrived(dx, dy){
+  const c = tileAt(G.x, G.y);
+  if (c === 'S'){ nextFloor(); return; }
+  if (c === '_'){
+    const nx = G.x + dx, ny = G.y + dy;
+    if (passable(nx, ny) && !entAt(nx, ny)){ startMove(dx, dy, .22); return; }
+    Snd.bump();
+  }
+}
+async function run(fn){ busy = true; try { await fn(); } finally { busy = false; needRelease = true; } }
+function interact(x, y){
+  const c = tileAt(x, y), f = FLOORS[G.floor];
+  run(async () => {
+    if (c === 'C'){ Snd.heal(); G.grid[y][x] = 'o'; G.cocoa += 2; updateHud(); await say('You found 2 mugs of Hot Cocoa! ☕ (Heals in battle)'); }
+    else if (c === 'K'){ Snd.heal(); G.grid[y][x] = 'o'; G.hasKey = true; updateHud(); await sayAll(['You found the CANDY-CANE KEY! 🗝','It smells like peppermint and mischief.']); }
+    else if (c === 'o'){ await say('An empty chest. Someone got here first. (You.)'); }
+    else if (c === 'L'){
+      if (G.hasKey){ Snd.stairs(); G.grid[y][x] = '.'; await say('The Candy-Cane Key turns... CLICK! The gate swings open.'); }
+      else { Snd.bump(); await say('A gate of twisted candy canes. It needs a key.'); }
+    }
+    else if (c === 'F'){
+      Snd.heal(); G.hp = G.maxHp; G.sp = G.spMax; G.cp = { x:G.x, y:G.y }; updateHud();
+      await say(G.floor === 2 ? 'You warm your hands at the blue coal fire. HP and specials restored! Spot saved.' : 'You warm up by the crackling fire. HP and specials restored! Spot saved.');
+    }
+    else if (c === 'N'){ await sayAll(f.npc); }
+    else if (c === 'S'){ Snd.bump(); await say(`A glowing magic bow seals the stairs. Defeat the ${MON[f.boss].name} first!`); }
+    else if (c === '~'){ Snd.bump(); await say('Bubbling hot molasses. Definitely not a swimming hole.'); }
+    else if (c === 'D'){ Snd.bump(); }
+    else { Snd.bump(); }
+  });
+}
+function nextFloor(){
+  run(async () => {
+    Snd.stairs();
+    await fade();
+    loadFloor(G.floor + 1); updateHud();
+    await sayAll(FLOORS[G.floor].intro);
+  });
+}
+function fade(){ return new Promise(r => { fx.flash = 1; setTimeout(r, 450); }); }
+
+/* ---------- Battle ---------- */
+const enemyBox = document.getElementById('enemyBox'), heroBox = document.getElementById('heroBox');
+function battleHud(){
+  const b = battle; if (!b) return;
+  document.getElementById('eName').textContent = b.e.name;
+  const ep = Math.max(0, b.e.hp / b.e.maxHp); const eb = document.getElementById('eBar');
+  eb.style.width = (ep*100) + '%'; eb.style.background = ep > .5 ? '#3fbf5a' : ep > .2 ? '#f2c14e' : '#d63a3a';
+  document.getElementById('eStatus').textContent = b.frozen ? '❄ FROZEN' : (b.e.weak ? '▼ WEAKENED' : '');
+  document.getElementById('hName').textContent = G.p.name + (G.spirit ? ' ✨' : '');
+  const hp = Math.max(0, G.hp / G.maxHp); const hb = document.getElementById('hBar');
+  hb.style.width = (hp*100) + '%'; hb.style.background = hp > .5 ? '#3fbf5a' : hp > .2 ? '#f2c14e' : '#d63a3a';
+  document.getElementById('hNum').textContent = `${Math.max(0,G.hp)}/${G.maxHp}`;
+}
+const rand = (a, b) => a + Math.random()*(b - a);
+function dmgCalc(atk, mult, def, pierce=false){ return Math.max(1, Math.round(atk*mult*rand(.85,1.15) - (pierce ? 0 : def*.6))); }
+const wait = ms => new Promise(r => setTimeout(r, ms));
+async function hitEnemy(n, crit){ battle.e.hp -= n; Snd.hit(); fx.enemyBlink = 24; fx.shake = crit ? 10 : 4; battleHud(); await wait(380); }
+async function hitHero(n){ G.hp -= n; Snd.hit(); fx.heroBlink = 24; fx.shake = 6; battleHud(); updateHud(); await wait(380); }
+
+function encounter(e){
+  run(async () => {
+    const res = await doBattle(e);
+    if (res === 'win'){
+      e.alive = false;
+      if (e.boss){
+        G.bossDown[G.floor] = true;
+        if (MON[e.type].final){ await finale(); return; }
+        G.maxHp += 12; G.atk += 3; G.def += 1; G.hp = G.maxHp; G.spMax += 1; G.sp = G.spMax; updateHud();
+        Snd.win();
+        await sayAll([`LEVEL UP! ${G.p.name} grows stronger! Max HP +12, Power +3, +1 Special.`, 'The magic bow on the stairs unravels...']);
+      }
+    } else if (res === 'lose'){
+      G.spirit += 1; G.atk += 1; G.maxHp += 5; G.hp = G.maxHp; G.sp = G.spMax; G.x = G.cp.x; G.y = G.cp.y; updateHud();
+      await sayAll([`${G.p.name} fainted!`, 'A kindly elf drags you back to the last fireplace...', '✨ Your Christmas spirit grows! Power +1, Max HP +5.']);
+    }
+  });
+}
+async function doBattle(ent){
+  const def = MON[ent.type];
+  battle = { ent, def, e:{ name:def.name, hp:def.hp, maxHp:def.hp, atk:def.atk, def:def.def, weak:false }, turn:0, frozen:false };
+  fx.enemyGone = false; fx.flash = 1; await wait(350);
+  mode = 'battle'; enemyBox.style.display = 'block'; heroBox.style.display = 'block'; document.getElementById('hud').style.display = 'none';
+  battleHud();
+  if (def.boss) await sayAll(def.intro, true); else await say(`A wild ${def.name} appeared!`, true);
+  let result = null;
+  while (!result){
+    const opts = [
+      { label:'⚔ ' + G.p.atkName },
+      { label:`✦ Special (${G.sp})`, disabled:G.sp <= 0 },
+      { label:`☕ Cocoa (${G.cocoa})`, disabled:G.cocoa <= 0 || G.hp >= G.maxHp },
+      { label:'🏃 Run', disabled:!!def.boss },
+    ];
+    if (opts[1].disabled && opts[2].disabled && opts[3].disabled) opts[0].label = '⚔ ' + G.p.atkName;
+    const pick = await choose(opts);
+    const e = battle.e;
+    if (pick === 0){
+      await say(`${G.p.name} used ${G.p.atkName}!`, true);
+      const crit = Math.random() < .08 + G.spd*.006; const n = dmgCalc(G.atk, crit ? 1.6 : 1, e.def);
+      await hitEnemy(n, crit); if (crit) await say('A critical hit!', true);
+    } else if (pick === 1){
+      G.sp--; updateHud(); await special();
+    } else if (pick === 2){
+      G.cocoa--; const h = Math.round(G.maxHp*.6); G.hp = Math.min(G.maxHp, G.hp + h); Snd.heal(); battleHud(); updateHud();
+      await say(`${G.p.name} sipped Hot Cocoa. Mmm! Recovered HP.`, true);
+    } else if (pick === 3){
+      if (Math.random() < .75){ await say('You got away safely!', true); result = 'run'; break; }
+      await say('Couldn\'t get away!', true);
+    }
+    if (e.hp <= 0){
+      fx.enemyGone = true; Snd.win();
+      await say(def.final ? 'KRAMPUS staggers... and falls!' : `${def.name} was defeated!`, true);
+      result = 'win'; break;
+    }
+    // enemy turn
+    battle.turn++;
+    if (battle.frozen){ battle.frozen = false; battleHud(); await say(`${e.name} is frozen solid and can't move!`, true); continue; }
+    const big = def.boss && battle.turn % def.every === 0;
+    await say(`${e.name} used ${big ? def.bigName : def.atkName}!`, true);
+    if (Math.random() < G.spd*.015){ await say(`${G.p.name} dodged it!`, true); continue; }
+    const n = dmgCalc(e.atk - (e.weak ? 2 : 0), big ? def.bigMult : 1, G.def);
+    await hitHero(n);
+    if (G.hp <= 0){ G.hp = 0; battleHud(); Snd.lose(); await say(`${G.p.name} is out of Christmas cheer...`, true); result = 'lose'; }
+  }
+  textbox.classList.remove('show'); enemyBox.style.display = 'none'; heroBox.style.display = 'none';
+  fx.flash = 1; await wait(250); mode = 'map'; battle = null; showHud(true); updateHud();
+  return result;
+}
+async function special(){
+  const p = G.p, e = battle.e;
+  await say(`${p.name} used ${p.spName}!`, true);
+  switch (p.name){
+    case 'David':   await hitEnemy(dmgCalc(G.atk, 2.0, e.def), true); break;
+    case 'Juli':    await hitEnemy(dmgCalc(G.atk, 1.5, e.def), true);
+                    if (e.hp > 0 && Math.random() < .65){ battle.frozen = true; battleHud(); await say(`${e.name} is frozen solid!`, true); } break;
+    case 'Jordan':  for (let i = 1; i <= 3 && e.hp > 0; i++){ await say(`Robot #${i} attacks!`, true); await hitEnemy(dmgCalc(G.atk, .8, e.def*.5), false); } break;
+    case 'Erin':    { const h = Math.round(G.maxHp*.55); G.hp = Math.min(G.maxHp, G.hp + h); Snd.heal(); battleHud(); updateHud();
+                    await say(`A sweet melody! ${p.name} recovered HP!`, true); await hitEnemy(dmgCalc(G.atk, 1.0, e.def), false); } break;
+    case 'Dick':    await hitEnemy(dmgCalc(G.atk, 2.3, e.def), true); break;
+    case 'Dawn':    { const n = dmgCalc(G.atk, 1.6, e.def); await hitEnemy(n, true); G.hp = Math.min(G.maxHp, G.hp + Math.ceil(n*.6)); Snd.heal(); battleHud(); updateHud();
+                    await say(`${p.name} snacked on a spare cookie and healed!`, true); } break;
+    case 'Chelsea': for (let i = 0; i < 2 && e.hp > 0; i++){ const crit = Math.random() < .5; await hitEnemy(dmgCalc(G.atk, crit ? 1.5 : 1, e.def), crit); if (crit) await say('Bullseye! Critical hit!', true); } break;
+    case 'Jake':    await hitEnemy(dmgCalc(G.atk, 1.7, e.def, true), true);
+                    if (e.hp > 0 && !e.weak){ e.weak = true; battleHud(); await say(`${e.name} is shivering! Its attacks are weaker now.`, true); } break;
+  }
+}
+
+/* ---------- Finale + reveal ---------- */
+const revealEl = document.getElementById('reveal');
+async function finale(){
+  Snd.win();
+  await sayAll(['Krampus crumbles into a pile of coal!', 'Santa\'s stolen list flutters down from his sack...', `Your name glows on the page, ${G.p.name}.`]);
+  showHud(false);
+  revealEl.innerHTML = `
+    <h1 class="title">VICTORY!<span>The list is yours</span></h1>
+    <div class="scroll">
+      Santa's list is magic: it will show your name <b class="warn">ONE TIME ONLY</b>.<br><br>
+      Once you open it, it locks forever and nobody (including you) can see it again.<br><br>
+      Have a pen ready!
+    </div>
+    <button class="big red" id="unseal" type="button">🎁 OPEN THE LIST</button>`;
+  revealEl.classList.add('show');
+  document.getElementById('unseal').onclick = unseal;
+}
+async function unseal(){
+  const btn = document.getElementById('unseal'); btn.disabled = true; btn.textContent = 'Unrolling...';
+  let res;
+  try { res = await Lock.claim(G.p.name); }
+  catch(e){ btn.disabled = false; btn.textContent = '🎁 TRY AGAIN'; alertBox('Couldn\'t reach the North Pole. Check your connection and tap again.'); return; }
+  if (res !== 'ok'){
+    revealEl.innerHTML = `<div class="scroll">The page is blank...<br><br>${esc(G.p.name)}'s name was <b class="warn">already revealed</b> once. The list won't show it again.<br><br>Ask the organizer if something went wrong.</div>
+      <button class="big ghost" type="button" onclick="location.reload()">Back to start</button>`;
+    return;
+  }
+  const who = PLAYERS[gifteeOf(G.pi)].name;
+  Snd.jingle();
+  revealEl.innerHTML = `
+    <div class="scroll">
+      ${esc(G.p.name)}, you are the Secret Santa for...
+      <div class="who">${esc(who)}</div>
+      🎄 Shhh! Keep it a secret. 🎄<br><br>
+      <span class="warn">This will never be shown again.</span><br>Write it down now!
+    </div>
+    <button class="big" id="burn" type="button">✅ I'VE GOT IT, BURN THE LIST</button>`;
+  document.getElementById('burn').onclick = () => {
+    revealEl.innerHTML = `<div class="ash">🔥<br><br>The list crumbles to ash.<br><br>Merry Christmas,<br>${esc(G.p.name)}!</div>
+      <button class="big ghost" type="button" onclick="location.reload()">Back to start</button>`;
+  };
+}
+function alertBox(msg){ const d = document.createElement('div'); d.className = 'panel'; d.textContent = msg; revealEl.appendChild(d); setTimeout(() => d.remove(), 5000); }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- Title + hero select ---------- */
+const titleEl = document.getElementById('title'), confirmEl = document.getElementById('confirm');
+function bigSprite(src, px){ const c = document.createElement('canvas'); c.width = 16; c.height = 16; c.getContext('2d').drawImage(src, 0, 0); return c; }
+async function loadTitle(){
+  const cards = document.getElementById('cards');
+  let locked;
+  try { locked = await Lock.list(); }
+  catch(e){
+    cards.innerHTML = `<div class="loading">Can't reach the North Pole right now.<br><br><button class="big" type="button" id="retry">Try again</button></div>`;
+    document.getElementById('retry').onclick = () => { cards.innerHTML = '<div class="loading">Checking the naughty list...</div>'; loadTitle(); };
+    return;
+  }
+  cards.innerHTML = '<div class="grid"></div><p class="sub" style="margin-top:18px">Choose YOUR name. Each hero fights differently!</p>';
+  const grid = cards.querySelector('.grid');
+  PLAYERS.forEach((p, i) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'card';
+    const isLocked = locked.includes(p.name);
+    b.appendChild(bigSprite(heroSprites[i].r));
+    const nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = p.name; b.appendChild(nm);
+    const cl = document.createElement('div'); cl.className = 'cl'; cl.textContent = p.cls; b.appendChild(cl);
+    if (isLocked){ b.disabled = true; const l = document.createElement('div'); l.className = 'lock'; l.innerHTML = '<b>🔒 LOCKED</b>'; b.appendChild(l); }
+    else b.onclick = () => { Snd.unlock(); Snd.blip(); showConfirm(i); };
+    grid.appendChild(b);
+  });
+}
+function showConfirm(i){
+  const p = PLAYERS[i];
+  confirmEl.innerHTML = `
+    <h1 class="title">${esc(p.name.toUpperCase())}<span>${esc(p.cls)}</span></h1>
+    <div class="panel"><div class="hero-row"><div id="cHero"></div><div>
+      ♥ HP <b>${p.hp}</b><br>⚔ Power <b>${p.atk}</b><br>🛡 Guard <b>${p.def}</b><br>💨 Speed <b>${p.spd}</b></div></div>
+      <br>⚔ <b>${esc(p.atkName)}</b><br>✦ <b>${esc(p.spName)}</b> (x${p.sp}): ${esc(p.spDesc)}</div>
+    <div class="panel">Are you really <b>${esc(p.name)}</b>?<br>Fight through 3 floors and defeat Krampus. Your Secret Santa name will appear <b>once</b>, then lock forever.</div>
+    <button class="big" id="go" type="button">⚔ ENTER THE DUNGEON</button>
+    <button class="big ghost" id="back" type="button">◀ Not me, go back</button>`;
+  const c = bigSprite(heroSprites[i].r); c.style.cssText = 'width:96px;height:96px;image-rendering:pixelated;background:#0d1b2a;border:3px solid #33506f;border-radius:6px;display:block';
+  document.getElementById('cHero').appendChild(c);
+  confirmEl.classList.add('show'); confirmEl.scrollTop = 0;
+  document.getElementById('back').onclick = () => confirmEl.classList.remove('show');
+  document.getElementById('go').onclick = () => startGame(i);
+}
+async function startGame(i){
+  Snd.unlock(); Snd.stairs();
+  // Double-check the lock before starting
+  try { const l = await Lock.list(); if (l.includes(PLAYERS[i].name)){ confirmEl.classList.remove('show'); loadTitle(); return; } } catch(e){}
+  newRun(i); loadFloor(0);
+  confirmEl.classList.remove('show'); titleEl.classList.remove('show');
+  mode = 'map'; showHud(true); updateHud();
+  run(async () => {
+    await sayAll([`Krampus has stolen Santa's list of Secret Santa names!`, `Only you, ${G.p.name} the ${G.p.cls}, can get it back.`, 'Bump into monsters to fight. Bump into chests, signs, and fires to use them.']);
+    await sayAll(FLOORS[0].intro);
+  });
+}
+
+/* ---------- Rendering ---------- */
+let T = 0;
+function px(x, y, w, h, c){ ctx.fillStyle = c; ctx.fillRect(x, y, w, h); }
+function hash(x, y){ return ((x*73856093) ^ (y*19349663)) >>> 0; }
+const THEMES = {
+  workshop:{ floor:'#b9844f', floor2:'#a3703f', wall:'#2f5d3a', wall2:'#24492d', trim:'#d9b44a', bg1:'#3a1f1f', bg2:'#7a3a2a' },
+  caverns: { floor:'#d9a066', floor2:'#c4874a', wall:'#5a3420', wall2:'#432616', trim:'#fff3e0', bg1:'#3b2414', bg2:'#8a5530' },
+  ice:     { floor:'#9fb8d6', floor2:'#87a2c4', wall:'#1f3a6e', wall2:'#162b54', trim:'#bfe6ff', bg1:'#0b1530', bg2:'#2a4a8a' },
+};
+function drawFloor(th, sx, sy, gx, gy){
+  px(sx, sy, 16, 16, th.floor);
+  const h = hash(gx, gy);
+  if (FLOORS[G.floor].theme === 'workshop'){ px(sx, sy + 7, 16, 1, th.floor2); px(sx + ((gy % 2) ? 4 : 11), sy, 1, 7, th.floor2); px(sx + ((gy % 2) ? 9 : 2), sy + 8, 1, 8, th.floor2); }
+  else if (FLOORS[G.floor].theme === 'caverns'){ px(sx + (h % 12) + 2, sy + ((h >> 4) % 12) + 2, 2, 2, th.floor2); px(sx + ((h >> 8) % 12) + 1, sy + ((h >> 12) % 12) + 1, 1, 1, th.floor2); }
+  else { px(sx, sy, 16, 1, th.floor2); px(sx, sy, 1, 16, th.floor2); if (h % 5 === 0) px(sx + 5, sy + 5, 2, 1, '#c8dcef'); }
+}
+function drawTile(c, sx, sy, gx, gy){
+  const f = FLOORS[G.floor], th = THEMES[f.theme];
+  if (c === '#'){
+    px(sx, sy, 16, 16, th.wall);
+    if (f.theme === 'workshop'){ px(sx, sy + 10, 16, 2, th.trim); px(sx, sy + 12, 16, 4, th.wall2); if ((gx + gy) % 2) px(sx + 6, sy + 2, 3, 6, th.wall2); }
+    else if (f.theme === 'caverns'){ px(sx, sy, 16, 3, th.trim); px(sx + 2 + hash(gx,gy) % 9, sy + 3, 2, 3 + hash(gy,gx) % 4, th.trim); px(sx, sy + 12, 16, 4, th.wall2); }
+    else { px(sx + 1, sy + 1, 6, 6, th.wall2); px(sx + 9, sy + 9, 6, 6, th.wall2); px(sx + 2, sy + 2, 2, 1, th.trim); px(sx + 10, sy + 10, 2, 1, th.trim); }
+    return;
+  }
+  if (c === '~'){
+    px(sx, sy, 16, 16, '#4a2a14');
+    const o = Math.floor(T/8 + gx*3) % 16; px(sx + o, sy + 4, 4, 1, '#7a4520'); px(sx + (o + 8) % 16, sy + 11, 4, 1, '#7a4520');
+    if ((Math.floor(T/20) + gx + gy) % 7 === 0) px(sx + 7, sy + 7, 2, 2, '#8a5530');
+    return;
+  }
+  if (c === '_'){
+    px(sx, sy, 16, 16, '#cdeefd'); px(sx, sy + 15, 16, 1, '#a9d8f0');
+    const s = (Math.floor(T/3) + gx*5 + gy*9) % 60; if (s < 6) px(sx + 3 + s, sy + 3 + s, 2, 2, '#ffffff');
+    px(sx + 10, sy + 4, 3, 1, '#ffffff'); return;
+  }
+  if (c === '='){
+    px(sx, sy, 16, 16, '#4a2a14');
+    for (let i = 0; i < 4; i++) px(sx + i*4, sy + 1, 4, 14, i % 2 ? '#f4f4f4' : '#d63a3a');
+    px(sx, sy + 1, 16, 1, '#1a1c2c'); px(sx, sy + 14, 16, 1, '#1a1c2c'); return;
+  }
+  drawFloor(th, sx, sy, gx, gy);
+  const v = hash(gx, gy) % 3;
+  if (c === 'D'){
+    if (f.theme === 'workshop'){ // presents
+      const cols = [['#d63a3a','#f2c14e'],['#3fa34d','#f4f4f4'],['#3b5bd6','#ff8fb1']][v];
+      px(sx + 2, sy + 5, 12, 10, '#1a1c2c'); px(sx + 3, sy + 6, 10, 8, cols[0]); px(sx + 7, sy + 6, 2, 8, cols[1]); px(sx + 3, sy + 9, 10, 2, cols[1]);
+      px(sx + 5, sy + 3, 2, 3, cols[1]); px(sx + 9, sy + 3, 2, 3, cols[1]);
+    } else if (f.theme === 'caverns'){
+      if (v === 0){ // candy cane
+        px(sx + 6, sy + 2, 4, 13, '#f4f4f4'); px(sx + 6, sy + 2, 8, 3, '#f4f4f4'); px(sx + 11, sy + 2, 3, 6, '#f4f4f4');
+        for (let i = 0; i < 13; i += 3) px(sx + 6, sy + 3 + i, 4, 1, '#d63a3a'); px(sx + 11, sy + 5, 3, 1, '#d63a3a');
+      } else { const gc = v === 1 ? '#d63a3a' : '#8a4fd1'; px(sx + 3, sy + 7, 10, 8, '#1a1c2c'); px(sx + 4, sy + 6, 8, 8, gc); px(sx + 5, sy + 5, 6, 2, gc); px(sx + 6, sy + 7, 2, 1, '#fff'); }
+    } else { // ice crystal
+      px(sx + 6, sy + 1, 4, 14, '#1a1c2c'); px(sx + 7, sy + 2, 2, 12, '#7fd3ff'); px(sx + 3, sy + 6, 3, 9, '#5ab0e0'); px(sx + 10, sy + 5, 3, 10, '#5ab0e0'); px(sx + 7, sy + 3, 1, 4, '#fff');
+    }
+    return;
+  }
+  if (c === 'C' || c === 'K' || c === 'o'){
+    px(sx + 2, sy + 5, 12, 10, '#1a1c2c'); px(sx + 3, sy + 6, 10, 8, '#8a5a2b'); px(sx + 3, sy + 9, 10, 1, '#5e3a1c');
+    if (c === 'o'){ px(sx + 3, sy + 6, 10, 3, '#2a1a0c'); }
+    else { px(sx + 7, sy + 8, 2, 3, '#f2c14e'); if (c === 'K' && (T >> 4) % 2) { px(sx + 13, sy + 3, 2, 2, '#fff'); px(sx + 1, sy + 4, 1, 1, '#fff'); } }
+    return;
+  }
+  if (c === 'F'){
+    const blue = f.theme === 'ice';
+    px(sx + 1, sy + 1, 14, 15, '#1a1c2c'); px(sx + 2, sy + 2, 12, 13, blue ? '#3a4a66' : '#9a3b2a');
+    px(sx + 4, sy + 7, 8, 8, '#1a1c2c'); px(sx + 1, sy + 1, 14, 2, blue ? '#5a6a86' : '#c8c8c8');
+    const fl = Math.sin(T/5)*1.5;
+    px(sx + 5, sy + 10 - fl, 6, 5 + fl, blue ? '#3b8bff' : '#ff8a1f'); px(sx + 6, sy + 12 - fl/2, 4, 3, blue ? '#bfe6ff' : '#f2c14e');
+    if (f.theme === 'workshop'){ px(sx + 3, sy + 3, 2, 3, '#d63a3a'); px(sx + 11, sy + 3, 2, 3, '#3fa34d'); }
+    return;
+  }
+  if (c === 'L'){
+    for (let i = 0; i < 4; i++){ const bx = sx + 1 + i*4; px(bx, sy, 3, 16, '#f4f4f4'); for (let j = (i % 2); j < 16; j += 3) px(bx, sy + j, 3, 1, '#d63a3a'); }
+    px(sx, sy + 7, 16, 2, '#3fa34d'); return;
+  }
+  if (c === 'N'){ ctx.drawImage(npcSprites[G.floor], sx, sy + (((T >> 5) % 2) ? -1 : 0)); return; }
+  if (c === 'S'){
+    for (let i = 0; i < 4; i++) px(sx + 1 + i, sy + 2 + i*3, 14 - i*2, 3, i % 2 ? '#2a2a3a' : '#3a3a4e');
+    px(sx + 5, sy + 13, 6, 3, '#0a0a12');
+    if (!G.bossDown[G.floor]){ px(sx, sy + 7, 16, 2, '#d63a3a'); px(sx + 7, sy, 2, 16, '#d63a3a'); px(sx + 5, sy + 5, 6, 6, '#f2c14e'); px(sx + 6, sy + 6, 4, 4, '#d63a3a'); }
+    else if ((T >> 4) % 2) px(sx + 7, sy + 1, 2, 2, '#fff');
+  }
+}
+function renderMap(){
+  const f = FLOORS[G.floor];
+  let pxp = G.x*TS, pyp = G.y*TS;
+  if (G.moving){ const m = G.moving; pxp = (m.fx + (m.tx - m.fx)*m.t)*TS; pyp = (m.fy + (m.ty - m.fy)*m.t)*TS; }
+  const mw = G.grid[0].length*TS, mh = G.grid.length*TS;
+  let cx = Math.round(pxp + 8 - VW/2), cy = Math.round(pyp + 8 - VH/2);
+  cx = Math.max(0, Math.min(mw - VW, cx)); cy = Math.max(0, Math.min(mh - VH, cy));
+  px(0, 0, VW, VH, '#000');
+  const x0 = Math.floor(cx/TS), y0 = Math.floor(cy/TS);
+  for (let y = y0; y <= y0 + 10; y++) for (let x = x0; x <= x0 + 11; x++){
+    if (!G.grid[y] || G.grid[y][x] === undefined) continue;
+    drawTile(G.grid[y][x], x*TS - cx, y*TS - cy, x, y);
+  }
+  for (const e of G.ents){
+    if (!e.alive) continue;
+    const sx = e.x*TS - cx, sy = e.y*TS - cy; if (sx < -16 || sy < -16 || sx > VW || sy > VH) continue;
+    const bob = ((T >> 4) + e.x) % 2 ? -1 : 0;
+    if (e.boss){ ctx.globalAlpha = .35 + .15*Math.sin(T/10); px(sx - 1, sy - 1, 18, 18, f.theme === 'ice' ? '#7a1a3a' : '#f2c14e'); ctx.globalAlpha = 1; }
+    ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(sx + 3, sy + 14, 10, 2);
+    ctx.drawImage(monSprites[e.type], sx, sy + bob);
+  }
+  const walkBob = G.moving ? ((G.step % 2) ? -1 : 0) : 0;
+  ctx.fillStyle = 'rgba(0,0,0,.25)'; ctx.fillRect(Math.round(pxp - cx) + 4, Math.round(pyp - cy) + 14, 8, 2);
+  ctx.drawImage(G.dir === 'l' ? heroSprites[G.pi].l : heroSprites[G.pi].r, Math.round(pxp - cx), Math.round(pyp - cy) + walkBob);
+  if (f.theme === 'ice' || f.theme === 'workshop') drawSnow(f.theme === 'ice' ? 22 : 10);
+}
+const flakes = Array.from({ length:30 }, (_, i) => ({ x:Math.random()*VW, y:Math.random()*VH, s:.2 + Math.random()*.5 }));
+function drawSnow(n){ for (let i = 0; i < n; i++){ const k = flakes[i]; k.y += k.s; k.x += Math.sin((T + i*20)/30)*.2; if (k.y > VH) { k.y = -2; k.x = Math.random()*VW; } px(Math.round(k.x), Math.round(k.y), 1, 1, 'rgba(255,255,255,.8)'); } }
+function renderBattle(){
+  const th = THEMES[FLOORS[G.floor].theme], def = battle.def;
+  const g = ctx.createLinearGradient(0, 0, 0, VH); g.addColorStop(0, th.bg1); g.addColorStop(1, th.bg2); ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
+  for (let i = 0; i < 18; i++){ const sx = (hash(i, 3) % VW), sy = (hash(i, 9) % 60); px(sx, sy, 1, 1, 'rgba(255,255,255,.35)'); }
+  ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(118, 58, 32, 6, 0, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(38, 98, 30, 6, 0, 0, Math.PI*2); ctx.fill();
+  const size = def.boss ? 54 : 44;
+  if (!fx.enemyGone && !(fx.enemyBlink && (fx.enemyBlink >> 2) % 2)){
+    const bob = Math.round(Math.sin(T/12)*1.5);
+    ctx.drawImage(monSprites[battle.ent.type], 118 - size/2, 60 - size + bob, size, size);
+  }
+  if (battle.frozen){ ctx.globalAlpha = .35; px(118 - size/2, 60 - size, size, size, '#bfe6ff'); ctx.globalAlpha = 1; }
+  if (!(fx.heroBlink && (fx.heroBlink >> 2) % 2)) ctx.drawImage(heroSprites[G.pi].r, 14, 52, 48, 48);
+}
+function frame(){
+  T++; update();
+  ctx.save();
+  if (fx.shake){ ctx.translate(Math.round(rand(-1,1)*fx.shake/3), Math.round(rand(-1,1)*fx.shake/3)); fx.shake--; }
+  if (mode === 'battle' && battle) renderBattle();
+  else if (G && G.grid) renderMap();
+  else { px(0, 0, VW, VH, '#0d1b2a'); drawSnow(30); }
+  ctx.restore();
+  if (fx.enemyBlink) fx.enemyBlink--; if (fx.heroBlink) fx.heroBlink--;
+  if (fx.flash > 0){ ctx.globalAlpha = Math.min(1, fx.flash); px(0, 0, VW, VH, '#fff'); ctx.globalAlpha = 1; fx.flash -= .06; }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+loadTitle();
+</script>
+</body>
+</html>
