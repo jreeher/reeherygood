@@ -1036,6 +1036,7 @@ function spawnEnemy(type, x, y, extra){
 function loadFloor(n){
   G.floor = n; const f = FLOORS[n];
   G.grid = f.map.map(r => r.split('')); G.hasKey = n === 0 ? false : G.hasKey;
+  if (G.p.mrs) G.grid.forEach(row => row.forEach((c, x) => { if (c === 'F') row[x] = '.'; }));   // no healing fireplaces for Mrs Claus
   G.enemies = []; G.shots = []; G.eshots = []; G.hazards = []; G.allies = []; G.pickups = []; G.parts = []; G.texts = []; G.rings = []; G.swing = null; G.boss = null;
   G.grid.forEach((row, y) => row.forEach((c, x) => {
     if (c === '@'){ G.x = x*TS + 8; G.y = y*TS + 13; row[x] = '.'; }
@@ -1584,7 +1585,7 @@ function showMrs(){
   confirmEl.innerHTML = `
     <h1 class="title">MRS CLAUS<span>The Endless Dungeon</span></h1>
     <div class="panel">Not part of the Secret Santa draw. She beats Evil Santa and keeps going: <b>${FLOORS.length - 3} more floors</b>, each with its own boss, each much harder than the last.<br><br>
-      ❤ <b>3 lives</b> for the whole run (+1 after floors 5 and 10). Progress saves on this device at every floor.${best ? `<br><br>🏆 Best on this device: <b>Floor ${best}</b>` : ''}</div>
+      ❤ <b>3 lives</b> for the whole run (+1 after floors 5 and 10). <b>No healing fireplaces</b>: dying sends her back to the start of the floor. Progress saves on this device at every floor.${best ? `<br><br>🏆 Best on this device: <b>Floor ${best}</b>` : ''}</div>
     <div class="panel" id="shuf"></div>
     <div id="mrsBtns"></div>
     <button class="big ghost" id="back" type="button">◀ Back</button>`;
