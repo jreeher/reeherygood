@@ -1,5 +1,6 @@
 // Tiny lock server for Krampus's Dungeon (Secret Santa).
 // Remembers which players have already revealed their name, so it only shows once.
+// Also keeps the Mrs Claus leaderboard (in its own file).
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -41,6 +42,39 @@ app.post('/lock', (req, res) => {
   res.json({ ok: true });
 });
 
+// ---------- Mrs Claus leaderboard (separate file; never touches the locks) ----------
+// Floors 1-20 = farthest floor reached. 21 = cleared all 20.
+const SCORES = path.join(dataDir, 'scores.json');
+const MAX_FLOOR = 21;
+let scores = { best: {}, runs: {} };
+try { scores = Object.assign(scores, JSON.parse(fs.readFileSync(SCORES, 'utf8'))); } catch (e) {}
+const saveScores = () => fs.writeFileSync(SCORES, JSON.stringify(scores));
+const board = () => Object.entries(scores.best).map(([name, b]) => ({ name, floor: b.floor, at: b.at }))
+  .sort((a, b) => b.floor - a.floor || a.at - b.at);
+
+app.get('/leaderboard', (req, res) => res.json({ top: board() }));
+
+// Honor system with a light check: each run must climb one floor at a time.
+app.post('/score', (req, res) => {
+  const { name, run, floor } = req.body || {};
+  if (!PLAYERS.includes(name)) return res.status(400).json({ error: 'unknown player' });
+  if (typeof run !== 'string' || !/^[a-z0-9]{8,32}$/i.test(run)) return res.status(400).json({ error: 'bad run' });
+  if (!Number.isInteger(floor) || floor < 1 || floor > MAX_FLOOR) return res.status(400).json({ error: 'bad floor' });
+  const r = scores.runs[run];
+  if (!r && floor !== 1) return res.status(409).json({ error: 'runs start on floor 1' });
+  if (r && r.name !== name) return res.status(409).json({ error: 'run belongs to someone else' });
+  if (r && floor > r.floor + 1) return res.status(409).json({ error: 'skipped a floor', last: r.floor });
+  if (!r || floor > r.floor){
+    scores.runs[run] = { name, floor, t: Date.now() };
+    const ids = Object.keys(scores.runs);   // keep the run list small
+    if (ids.length > 300) ids.sort((a, b) => scores.runs[a].t - scores.runs[b].t).slice(0, ids.length - 300).forEach(id => delete scores.runs[id]);
+    const b = scores.best[name];
+    if (!b || floor > b.floor) scores.best[name] = { floor, at: Date.now() };
+    saveScores();
+  }
+  res.json({ ok: true, top: board() });
+});
+
 // Organizer only: unlock one player ({"name":"Jake"}) or everyone ({}).
 app.post('/reset', (req, res) => {
   if (!RESET_TOKEN || req.get('X-Reset-Token') !== RESET_TOKEN) return res.status(403).json({ error: 'nope' });
@@ -48,6 +82,13 @@ app.post('/reset', (req, res) => {
   if (name) locked.delete(name); else locked.clear();
   save();
   res.json({ ok: true, locked: [...locked] });
+});
+
+// Organizer only: wipe the leaderboard (does not touch the locks).
+app.post('/reset-scores', (req, res) => {
+  if (!RESET_TOKEN || req.get('X-Reset-Token') !== RESET_TOKEN) return res.status(403).json({ error: 'nope' });
+  scores = { best: {}, runs: {} }; saveScores();
+  res.json({ ok: true });
 });
 
 const port = process.env.PORT || 3000;

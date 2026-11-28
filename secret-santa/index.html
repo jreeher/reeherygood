@@ -89,6 +89,15 @@
   .mrscard canvas { margin:0; flex:none; }
   .mrscard .cl { min-height:0; font-size:7px; color:#f2d6a0; }
   .mrscard .tag { font-size:7px; color:#f2c14e; margin-top:6px; }
+  .leader { margin-top:10px; background:#1b2b40; border:3px solid #33506f; border-radius:6px; padding:10px 12px; font-size:8px; line-height:2; }
+  .leader:empty { display:none; }
+  .leader .lbh { color:#f2c14e; margin-bottom:4px; }
+  .leader .lbr { display:flex; justify-content:space-between; color:#c9d6e3; }
+  .leader .lbr.first { color:#fff; }
+  .leader .lbe { color:#9fb3c8; }
+  .whogrid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-top:12px; }
+  .whobtn { font:inherit; font-size:8px; padding:10px 2px; color:#fff; background:#2a3d57; border:2px solid #556b84; border-radius:5px; cursor:pointer; }
+  .whobtn:hover { border-color:#f2c14e; }
   .card .lock { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
   .card .lock b { background:var(--red); color:#fff; font-size:8px; padding:5px 6px; border:2px solid #fff; transform:rotate(-12deg); }
   .loading { text-align:center; font-size:9px; color:#9fb3c8; margin:30px 0; line-height:2; }
@@ -1017,7 +1026,9 @@ function newRun(pi, save){
         floor:0, x:0, y:0, hw:5, hh:8, vx:0, vy:0, kbx:0, kby:0, face:{ x:1, y:0 }, dirLR:'r', inv:0, atkCd:0, cocoaCd:0, walkT:0, moving:false,
         grid:null, layer:null, enemies:[], shots:[], eshots:[], hazards:[], allies:[], pickups:[], parts:[], texts:[], rings:[], swing:null,
         bossDown:[], cp:null, boss:null, msgCd:0, time:0 };
-  if (p.mrs && save) Object.assign(G, { maxHp:save.maxHp, hp:save.maxHp, atk:save.atk, def:save.def, spMax:save.spMax, sp:save.spMax, cocoa:save.cocoa, lives:save.lives });
+  if (p.mrs && save) Object.assign(G, { maxHp:save.maxHp, hp:save.maxHp, atk:save.atk, def:save.def, spMax:save.spMax, sp:save.spMax, cocoa:save.cocoa, lives:save.lives,
+    who:save.who || null, run:save.run || null, reported:save.reported || 0 });
+  else if (p.mrs){ G.who = mrsWho; G.run = newRunId(); G.reported = 0; }
 }
 function spawnEnemy(type, x, y, extra){
   const d = MON[type], sc = d.scale || 1, w = SPR[d.spr][0].length;
@@ -1562,7 +1573,28 @@ function drawWeather(kind, n, ox, oy){
 const MRS_SAVE = 'mrs-claus-run-v1', MRS_BEST = 'mrs-claus-best-v1';
 let mrsPending = null;
 function mrsLoad(){ try { const s = JSON.parse(localStorage.getItem(MRS_SAVE) || 'null'); return s && s.floor < FLOORS.length && MOVES[s.ab] ? s : null; } catch(e){ return null; } }
-function mrsSave(){ if (!G || !G.p.mrs) return; try { localStorage.setItem(MRS_SAVE, JSON.stringify({ floor:G.floor, ab:G.ab, maxHp:G.maxHp, atk:G.atk, def:G.def, spMax:G.spMax, cocoa:G.cocoa, lives:G.lives })); } catch(e){} }
+function mrsSave(){ if (!G || !G.p.mrs) return; try { localStorage.setItem(MRS_SAVE, JSON.stringify({ floor:G.floor, ab:G.ab, maxHp:G.maxHp, atk:G.atk, def:G.def, spMax:G.spMax, cocoa:G.cocoa, lives:G.lives, who:G.who, run:G.run, reported:G.reported || 0 })); } catch(e){} }
+/* Family leaderboard for Mrs Claus runs (kept on the Railway server, separate from the locks) */
+let mrsWho = null;
+const Board = {
+  q: Promise.resolve(),
+  base(){ return LOCK_API.replace(/\/$/, ''); },
+  async top(){ if (!LOCK_API) return null; const r = await fetch(this.base() + '/leaderboard', { cache:'no-store' }); if (!r.ok) throw new Error('bad'); const j = await r.json(); return Array.isArray(j.top) ? j.top : []; },
+  report(floor){   // floor reached (1-20), or 21 for clearing everything
+    if (!LOCK_API || !G || !G.p.mrs || !G.who || !G.run) return;
+    const g = G;
+    this.q = this.q.then(async () => {
+      for (let f = (g.reported || 0) + 1; f <= floor; f++){
+        let r; try { r = await fetch(this.base() + '/score', { method:'POST', headers:{ 'Content-Type':'application/json' }, body:JSON.stringify({ name:g.who, run:g.run, floor:f }) }); } catch(e){ return; }
+        if (r.status === 409){ let j = {}; try { j = await r.json(); } catch(e){} if (Number.isInteger(j.last) && j.last >= f){ g.reported = j.last; f = j.last; continue; } return; }
+        if (!r.ok) return;
+        g.reported = f; if (g === G) mrsSave();
+      }
+    }).catch(() => {});
+  },
+};
+const floorLabel = f => f > FLOORS.length ? 'beat all ' + FLOORS.length + '!' : 'floor ' + f;
+function newRunId(){ const a = new Uint8Array(8); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(a) : a.forEach((_, i) => a[i] = Math.random()*256); return [...a].map(b => b.toString(16).padStart(2, '0')).join(''); }
 function mrsClear(){ try { localStorage.removeItem(MRS_SAVE); } catch(e){} }
 function mrsBest(){ try { return +localStorage.getItem(MRS_BEST) || 0; } catch(e){ return 0; } }
 function mrsRecord(f){ try { if (f > mrsBest()) localStorage.setItem(MRS_BEST, String(f)); } catch(e){} }
@@ -1574,7 +1606,7 @@ function mrsGameOver(){
   revealEl.classList.add('show');
 }
 function mrsVictory(){
-  mrsRecord(FLOORS.length); mrsClear(); showHud(false); hideBossBar(); Snd.jingle();
+  Board.report(FLOORS.length + 1); mrsRecord(FLOORS.length); mrsClear(); showHud(false); hideBossBar(); Snd.jingle();
   revealEl.innerHTML = `<h1 class="title">IMPOSSIBLE!<span>Mrs Claus saved Christmas</span></h1>
     <div class="scroll">Old Man Winter melts away.<br>All ${FLOORS.length} floors cleared<br>with ${esc(G.ap.name)}'s powers.<br><br><div class="who">LEGEND</div>Nobody was supposed to do this.</div>
     <button class="big ghost" type="button" onclick="location.reload()">Back to start</button>`;
@@ -1593,15 +1625,23 @@ function showMrs(){
   document.getElementById('back').onclick = () => confirmEl.classList.remove('show');
   const btns = document.getElementById('mrsBtns');
   if (save){
-    showAbility(save.ab, `Saved run: <b>Floor ${save.floor + 1}</b> · ❤${save.lives}`);
+    showAbility(save.ab, `Saved run${save.who ? ' (' + esc(save.who) + ')' : ''}: <b>Floor ${save.floor + 1}</b> · ❤${save.lives}`);
     btns.innerHTML = `<button class="big" id="cont" type="button">▶ CONTINUE FROM FLOOR ${save.floor + 1}</button><button class="big red" id="fresh" type="button">↻ NEW RUN (new shuffle)</button>`;
     document.getElementById('cont').onclick = () => startGame(MRS, save);
-    document.getElementById('fresh').onclick = () => { mrsClear(); mrsPending = null; showMrs(); };
+    document.getElementById('fresh').onclick = () => { mrsClear(); mrsPending = null; mrsWho = null; showMrs(); };
   } else if (mrsPending){
     showAbility(mrsPending, 'Mrs Claus shuffled everyone\'s powers and got...');
     btns.innerHTML = `<button class="big" id="go" type="button">⚔ ENTER THE DUNGEON</button>`;
     document.getElementById('go').onclick = () => startGame(MRS, null);
-  } else shuffleAbilities(btns);
+  } else if (!mrsWho) pickWho(btns);
+  else shuffleAbilities(btns);
+}
+function pickWho(btns){
+  const box = document.getElementById('shuf');
+  box.innerHTML = `Who's playing? Your best floor goes on the family leaderboard.<div class="whogrid"></div>`;
+  const g = box.querySelector('.whogrid');
+  PLAYERS.filter(p => !p.mrs).forEach(p => { const b = document.createElement('button'); b.type = 'button'; b.className = 'whobtn'; b.textContent = p.name;
+    b.onclick = () => { Snd.unlock(); Snd.blip(); mrsWho = p.name; shuffleAbilities(btns); }; g.appendChild(b); });
 }
 function showAbility(ab, lead){
   const i = PLAYERS.findIndex(p => p.name === ab), p = PLAYERS[i];
@@ -1613,7 +1653,7 @@ function showAbility(ab, lead){
 function shuffleAbilities(btns){
   const box = document.getElementById('shuf'), pool = PLAYERS.filter(p => !p.mrs).map(p => p.name);
   const pick = pool[(Math.random()*pool.length)|0];
-  box.innerHTML = `<div class="hero-row"><canvas id="shufCv" width="16" height="16" style="width:96px;height:96px;image-rendering:pixelated;background:#0d1b2a;border:3px solid #33506f;border-radius:6px"></canvas><div>Mrs Claus is shuffling everyone's powers...<br><br><b id="shufName">?</b></div></div>`;
+  box.innerHTML = `<div class="hero-row"><canvas id="shufCv" width="16" height="16" style="width:96px;height:96px;image-rendering:pixelated;background:#0d1b2a;border:3px solid #33506f;border-radius:6px"></canvas><div>${esc(mrsWho || '')}${mrsWho ? ', ' : ''}Mrs Claus is shuffling everyone's powers...<br><br><b id="shufName">?</b></div></div>`;
   const cvs = document.getElementById('shufCv').getContext('2d'), nm = document.getElementById('shufName');
   let step = 0, idx = 0; const total = 22 + pool.indexOf(pick) + pool.length*(1 + (Math.random()*2|0));
   const tick = () => {
@@ -1707,7 +1747,7 @@ function nextFloor(){
   mode = 'trans'; Snd.stairs(); fx.fade = 0; fx.fadeDir = 1;
   setTimeout(() => {
     loadFloor(G.floor + 1); updateHud(); fx.fadeDir = -1; mode = 'play'; G.inv = 1;
-    if (G.p.mrs) mrsSave();
+    if (G.p.mrs){ mrsSave(); Board.report(G.floor + 1); }
     banner('FLOOR ' + (G.floor + 1) + (G.p.mrs ? ' / ' + FLOORS.length : ''), FLOORS[G.floor].name, 2200);
   }, 520);
 }
@@ -1791,6 +1831,13 @@ async function loadTitle(){
   info.innerHTML = `<div class="nm">MRS CLAUS</div><div class="cl">Bonus hero · not in the draw<br>${FLOORS.length} floors · steals a random hero's powers</div><div class="tag">${save ? '▶ Saved run on floor ' + (save.floor + 1) : best ? '🏆 Best: floor ' + best : 'Can anyone reach floor ' + FLOORS.length + '?'}</div>`;
   mb.appendChild(info); mb.onclick = () => { Snd.unlock(); Snd.blip(); showMrs(); };
   grid.after(mb);
+  const lb = document.createElement('div'); lb.className = 'leader'; mb.after(lb);
+  Board.top().then(top => {
+    if (!top || !top.length){ if (top) lb.innerHTML = '<div class="lbh">🏆 FAMILY RECORD</div><div class="lbe">Nobody has braved the deep floors yet.</div>'; return; }
+    const tag = info.querySelector('.tag'); if (tag && !save) tag.textContent = `🏆 Record: ${top[0].name}, ${floorLabel(top[0].floor)}`;
+    lb.innerHTML = '<div class="lbh">🏆 FAMILY RECORD · MRS CLAUS</div>' + top.slice(0, 5).map((r, k) =>
+      `<div class="lbr${k ? '' : ' first'}"><span>${['🥇','🥈','🥉','4.','5.'][k]} ${esc(r.name)}</span><span>${esc(floorLabel(r.floor))}</span></div>`).join('');
+  }).catch(() => {});
 }
 function showConfirm(i){
   const p = PLAYERS[i], mv = MOVES[p.name];
@@ -1815,7 +1862,7 @@ async function startGame(i, save){
   if (!mrs) try { const l = await Lock.list(); if (l.includes(PLAYERS[i].name)){ confirmEl.classList.remove('show'); loadTitle(); return; } } catch(e){}
   if (mrs && !save && !mrsPending) return;
   newRun(i, mrs ? save : null); loadFloor(mrs && save ? save.floor : 0);
-  if (mrs) mrsSave();
+  if (mrs){ mrsSave(); Board.report(G.floor + 1); }
   confirmEl.classList.remove('show'); titleEl.classList.remove('show');
   mode = 'play'; showHud(true); updateHud(); fx.fade = 1; fx.fadeDir = -1;
   banner('FLOOR ' + (G.floor + 1) + (mrs ? ' / ' + FLOORS.length : ''), FLOORS[G.floor].name, 2200);

@@ -19,3 +19,14 @@ curl -X POST https://<your-domain>/reset -H "X-Reset-Token: <token>" -H "Content
 ```
 
 Send `{}` instead to unlock everyone.
+
+## Mrs Claus leaderboard
+
+Stored separately in `/data/scores.json` (the locks stay in `/data/locks.json`).
+`GET /leaderboard` lists everyone's farthest floor. Floor 21 means they cleared all 20.
+
+Wipe the leaderboard without touching the locks:
+
+```
+curl -X POST https://<your-domain>/reset-scores -H "X-Reset-Token: <token>"
+```
