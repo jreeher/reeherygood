@@ -84,6 +84,11 @@
   .card .nm { font-size:clamp(8px,2.4vw,11px); }
   .card .cl { font-size:6px; color:#9fb3c8; margin-top:6px; line-height:1.6; min-height:20px; }
   .card:disabled { cursor:not-allowed; filter:grayscale(1); opacity:.55; }
+  .mrscard { display:flex; align-items:center; gap:14px; width:100%; margin-top:16px; padding:10px 14px; text-align:left; border-color:#f2c14e;
+    background:linear-gradient(#5a1a22,#2a0e16); }
+  .mrscard canvas { margin:0; flex:none; }
+  .mrscard .cl { min-height:0; font-size:7px; color:#f2d6a0; }
+  .mrscard .tag { font-size:7px; color:#f2c14e; margin-top:6px; }
   .card .lock { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
   .card .lock b { background:var(--red); color:#fff; font-size:8px; padding:5px 6px; border:2px solid #fff; transform:rotate(-12deg); }
   .loading { text-align:center; font-size:9px; color:#9fb3c8; margin:30px 0; line-height:2; }
@@ -354,6 +359,529 @@ const FLOORS = [
 "####################"] },
 ];
 
+// ===== Mrs Claus floors 4-20 (hand-designed) =====
+const MORE_FLOORS = [
+  { name:'The Reindeer Stables', short:'Stables', theme:'stables', mons:['deer','bat'], boss:'blitzen',
+    map:[
+"######################",
+"#@...D..#..1....D..C.#",
+"#.......#.........1..#",
+"#..1....D..#####.....#",
+"#.......#..#.D.#..D..#",
+"#D.F....#..#.2.#.....#",
+"#..........#...#..1..#",
+"####.#######.###.#####",
+"#....D.........D.....#",
+"#.1..D.D.D.D.D.D..2..#",
+"#....................#",
+"#..2.D.D.D.D.D.D.....#",
+"#D....F......1.....D.#",
+"######.###########.###",
+"#..D.................#",
+"#.........B.......D..#",
+"#..D...............D.#",
+"#.........S..........#",
+"######################"] },
+  { name:'The Wrapping Paper Mill', short:'Mill', theme:'mill', mons:['bauble','nut'], boss:'wraith',
+    map:[
+"######################",
+"#@..1.......D.....1.C#",
+"#....................#",
+"#################.####",
+"#..2.......1.........#",
+"#.D...D....D....D....#",
+"#.##################.#",
+"#.#F....1.......2..#.#",
+"#.#.D..........D...#.#",
+"#.#####.######.#####.#",
+"#...1...#..C.1.#.....#",
+"####.####......D#..1.#",
+"#.......#.......#....#",
+"#.D...2.#.......#..D.#",
+"#..K....#...2...#....#",
+"##########L###########",
+"#...D..............D.#",
+"#F.........B.........#",
+"#.......D...S...D....#",
+"######################"] },
+  { name:'The Peppermint Mines', short:'Mines', theme:'mines', mons:['coal','gum'], boss:'golem',
+    map:[
+"######################",
+"#@..D....~......1...C#",
+"#........~...D.......#",
+"#..1.....=...........#",
+"#D.......~....2...D..#",
+"###.#####~#######.####",
+"#...D....~....D......#",
+"#.F..1...=.......1...#",
+"#........~...........#",
+"#~~~~=~~~~~~~~~~=~~~~#",
+"#.......D.....D......#",
+"#..2.........1....2..#",
+"#.D....C.....D.......#",
+"####.###########.#####",
+"#.....D......D.....F.#",
+"#..D.............D...#",
+"#..........B.........#",
+"#...D.....S......D...#",
+"######################"] },
+  { name:'The Frozen Lake', short:'Lake', theme:'lake', mons:['pup','snowman'], boss:'yeti',
+    map:[
+"######################",
+"#@.....D.....~~~...C.#",
+"#.F...........~~.....#",
+"#....1..___________..#",
+"#D....__~~__D___1__..#",
+"#....___~~______~~___#",
+"##.###___________~~__#",
+"#..1_____D____2_____.#",
+"#..______~~~______...#",
+"#.._2____~~~___D__1..#",
+"#...______________...#",
+"#D....~~....D....~~..#",
+"###########.##########",
+"#F.......D....D......#",
+"#....................#",
+"#.......D..B...D.....#",
+"#....................#",
+"#..........S.........#",
+"######################"] },
+  { name:'The Cookie Kitchen Inferno', short:'Inferno', theme:'inferno', mons:['ginger','candle'], boss:'oven',
+    map:[
+"######################",
+"#@..D...~~~~....1..C.#",
+"#.......~~~~.........#",
+"#..1....====....D....#",
+"#.F.....~~~~.........#",
+"#D......~~~~..2......#",
+"#~~=~~~~~~~~~~~~~~=~~#",
+"#......D.....~~..1...#",
+"#.2.........=~~......#",
+"#......1.....~~...D..#",
+"#~~~~~~~=~~~~~~~=~~~~#",
+"#...D...........C....#",
+"#.1.......D.......2..#",
+"####.###########.#####",
+"#..D.....F........D..#",
+"#....................#",
+"#..........B.........#",
+"#..D.......S.......D.#",
+"######################"] },
+  { name:'The Toy Soldier Barracks', short:'Barracks', theme:'barracks', mons:['soldier','nut'], boss:'tank',
+    map:[
+"######################",
+"#@...#..1...#...2..C.#",
+"#.F..#.D.D..#.D.D....#",
+"#....#......#........#",
+"#....D..1.......1....#",
+"##.###########.#####.#",
+"#......#.......#.....#",
+"#.D.2..#.D.D.D.#..1..#",
+"#......D.......D.....#",
+"#..1...#...2...#.D...#",
+"####.#####.#####.#####",
+"#...........1........#",
+"#.D.D.D.D...D.D.D.D..#",
+"#..2.....C......F....#",
+"##########.###########",
+"#..D...............D.#",
+"#....................#",
+"#.......D..B..D......#",
+"#....................#",
+"#..........S.........#",
+"######################"] },
+  { name:'The Hall of Mirrors', short:'Mirrors', theme:'mirror', mons:['bauble','ghost'], boss:'star',
+    map:[
+"######################",
+"#@........##.......C.#",
+"#.###.###.##.###.###.#",
+"#.#1....#....#...1.#.#",
+"#.#.###.#.DD.#.###.#.#",
+"#...#F.....2.....#...#",
+"###.#.####.####.##.###",
+"#...#..1..D...1..#...#",
+"#.###.##.####.##.###.#",
+"#..2...#..C...#....2.#",
+"#.####.#.####.#.####.#",
+"#......D...1..D......#",
+"######.#########.#####",
+"#..D................D#",
+"#....................#",
+"#.........B..........#",
+"#..D.............D...#",
+"#..........S.........#",
+"######################"] },
+  { name:'The Elf Prison', short:'Prison', theme:'prison', mons:['ghost','soldier'], boss:'warden',
+    map:[
+"######################",
+"#..1.#..D..#..K..#.C.#",
+"#....#.....#.....#...#",
+"#..D.#..2..#..1..#.D.#",
+"##.#####.#####.#####.#",
+"#@...................#",
+"#..F.......1.........#",
+"##.#####.#####.#####.#",
+"#..2.#.D...#..1..#...#",
+"#....#.....#.....#.2.#",
+"#.C..#..1..#..D..#...#",
+"##########L###########",
+"#F..D...........D....#",
+"#....................#",
+"#..........B.........#",
+"#..D.............D...#",
+"#..........S.........#",
+"######################"] },
+  { name:'The Candle Catacombs', short:'Catacombs', theme:'catacombs', mons:['candle','ghost'], boss:'lich',
+    map:[
+"######################",
+"#@.#....1...#.....C..#",
+"#..#.##.###.#.###.##.#",
+"#.F#.#...#..#...#..#.#",
+"#..#.#.1.#.###..#.1#.#",
+"#....#...#...#..####.#",
+"####.#####.#.#.......#",
+"#....#.....#.#####.###",
+"#.##.#.###.#...2.#...#",
+"#.#2...#.....#.#.#.#.#",
+"#.#.####.###.#.#...#.#",
+"#...#..1..#..#.###.#.#",
+"###.#.###.#.##..C..#.#",
+"#.....#...#....#.....#",
+"######.#############.#",
+"#F..D.........D......#",
+"#....................#",
+"#.........B..........#",
+"#..D......S......D...#",
+"######################"] },
+  { name:'The Sugarplum Garden', short:'Garden', theme:'garden', mons:['gum','bauble'], boss:'queen',
+    map:[
+"######################",
+"#@...D....~~~...1...C#",
+"#.F.......~~~........#",
+"#...1.D...===...D....#",
+"#.........~~~.....2..#",
+"#..~~~~...~~~...D....#",
+"#..~~~~..............#",
+"#.....2...D...~~~~...#",
+"#.D.........1.~~~~...#",
+"#....~~~=~~~.........#",
+"#.1..~~~=~~~...D..1..#",
+"#.........C..........#",
+"#..D...2.......D.....#",
+"########.#####.#######",
+"#.D.....F............#",
+"#....................#",
+"#..........B.........#",
+"#..D......S........D.#",
+"######################"] },
+  { name:'The Chimney Labyrinth', short:'Chimneys', theme:'chimney', mons:['coal','ghost'], boss:'serpent',
+    map:[
+"######################",
+"#@..#.......#...1..C.#",
+"#.#.#.#####.#.#####..#",
+"#.#...#.F.#...#...#..#",
+"#.#####...#####.#.##.#",
+"#...1.#.#.....#.#....#",
+"###.#.#.#####.#.####.#",
+"#...#...#..2#...#....#",
+"#.#######.#.#####.####",
+"#.#.....#.#.....#....#",
+"#.#.#.#.#.#####.####.#",
+"#...#.#...#.1.#....#.#",
+"#####.#####.#.####.#.#",
+"#..2..#.C...#......#.#",
+"#.####.######.######.#",
+"#......#.........#...#",
+"###.##.#.#######.#.###",
+"#F..............#....#",
+"##########.###########",
+"#..D...........D.....#",
+"#..........B.........#",
+"#..D.......S.....D...#",
+"######################"] },
+  { name:'The Aurora Peaks', short:'Aurora', theme:'aurora', mons:['snowman','pup','bauble'], boss:'dragon',
+    map:[
+"######################",
+"#@.....D....~~~...C..#",
+"#.F..1......~~~......#",
+"#...____....===..2...#",
+"#..______...~~~......#",
+"#~~~~~~=~~~~~~~~~=~~~#",
+"#..3......____....1..#",
+"#.D...2..______..D...#",
+"#.......________.....#",
+"#~~=~~~~~~~~~~~~~~~=~#",
+"#....1....D....3.....#",
+"#.D..........___.....#",
+"#...C...2...____..1..#",
+"#####.##########.#####",
+"#F...................#",
+"#...~~~........~~~...#",
+"#...~~~...B....~~~...#",
+"#....................#",
+"#..D......S.......D..#",
+"######################"] },
+  { name:'The Midnight Clock Tower', short:'Clockwork', theme:'clock', mons:['gear','soldier','bauble'], boss:'clock',
+    map:[
+"######################",
+"#@.................C.#",
+"#.################.#.#",
+"#.#..D..1........#.#.#",
+"#.#.##########.#.#...#",
+"#.#.#...2....#.#.###.#",
+"#.#.#.#####..#.#...#.#",
+"#.#.#.#.F.#.3#.#.1.#.#",
+"#.#.#.#...#..#.#...#.#",
+"#.#.#.##.##..#.#####.#",
+"#...#................#",
+"#####.########.#######",
+"#..2..D...1......D...#",
+"#.###########.######.#",
+"#...D.....C......2...#",
+"######.#######.#######",
+"#..D...............D.#",
+"#.........B..........#",
+"#..D.......S......D..#",
+"######################"] },
+  { name:'The Naughty List Archives', short:'Archives', theme:'archives', mons:['ghost','candle','soldier'], boss:'scribe',
+    map:[
+"######################",
+"#@..DDDDDD....DDDDDD.#",
+"#.F..................#",
+"#...DDDDDD.1..DDDDDD.#",
+"#.1..........2.......#",
+"#...DDDDDD....DDDDDD.#",
+"#.......3............#",
+"#...DDDDDD....DDDDDD.#",
+"#..2...........1...C.#",
+"#...DDDDDD....DDDDDD.#",
+"#.........3..........#",
+"##########.###########",
+"#F...D.........D.....#",
+"#....................#",
+"#..........B.........#",
+"#...D...........D....#",
+"#..........S.........#",
+"######################"] },
+  { name:'The Coal Furnace Core', short:'Furnace', theme:'coalcore', mons:['coal','gear','candle'], boss:'titan',
+    map:[
+"######################",
+"#@...~~~~...~~~~..C..#",
+"#.F..~~~~.1.~~~~.....#",
+"#....====...====..2..#",
+"#.1..~~~~...~~~~.....#",
+"#~~=~~~~~~=~~~~~~~=~~#",
+"#..3...~~...~~...1...#",
+"#......==...==.......#",
+"#.2....~~.D.~~...3...#",
+"#~~~~=~~~~~~~~~=~~~~~#",
+"#...1....C.....2.....#",
+"#.D....~~~~~~~....D..#",
+"#..3...~~~~~~~..1....#",
+"####.###########.#####",
+"#F...~~.......~~.....#",
+"#....~~...B...~~.....#",
+"#....................#",
+"#..D......S.......D..#",
+"######################"] },
+  { name:'The Blizzard Void', short:'Void', theme:'void', mons:['snowman','ghost','coal'], boss:'krampus',
+    map:[
+"######################",
+"#@....~~~~~~~~~...C..#",
+"#.F...=========......#",
+"#..1..~~~~~~~~~..2...#",
+"#~~=~~~~~~~~~~~~~~=~~#",
+"#...~~~..3..~~~......#",
+"#.2.===.....===..1...#",
+"#...~~~..D..~~~......#",
+"#~~~~~~~=~~~~~~~~=~~~#",
+"#..3..___..~~~..____.#",
+"#.....___..===..__2_.#",
+"#..1..___..~~~..____.#",
+"#~~~~~~=~~~~~~~=~~~~~#",
+"#..C.......3.........#",
+"#####.##########.#####",
+"#F......~~..~~.......#",
+"#.......~~B.~~.......#",
+"#....................#",
+"#..D......S.......D..#",
+"######################"] },
+  { name:'The Last Gift', short:'Last Gift', theme:'lastgift', mons:['ghost','gear','deer'], boss:'winter',
+    map:[
+"######################",
+"#@..D.....F.....D..C.#",
+"#....................#",
+"#..1...D......D...2..#",
+"#.......3....3.......#",
+"#..D....~~~~~~....D..#",
+"#.......~~~~~~.......#",
+"#..2....======....1..#",
+"#.......~~~~~~.......#",
+"#..D....~~~~~~....D..#",
+"#...3..........3.....#",
+"#..C.....1..2.....C..#",
+"##########.###########",
+"#F..D............D...#",
+"#....................#",
+"#..D.............D...#",
+"#..........B.........#",
+"#....................#",
+"#..D...............D.#",
+"######################"] },
+];
+
+/* =====================================================================
+   MRS CLAUS — the endless dungeon (floors 4-20). She is NOT in the draw.
+   ===================================================================== */
+const MRS = PLAYERS.length;   // her index (always after the 8 real players)
+STYLES.mrs = { 0:"......KKKK......", 1:".....KHHHHK.....", 2:"....KHHHHHHK....", 3:"...KHHHHHHHHK...", 4:"...KHSSSSSSHK...",
+  5:"...KSKLKKLKSK...", 8:".....KWWWWK.....", 12:"...KKCCCCCCKK...", 13:"...KCCCCCCCCK...", 14:"...KWWWWWWWWK...", 15:"....KBBKKBBK...." };
+PLAYERS.push({ name:'Mrs Claus', cls:'Keeper of the Endless Dungeon', style:'mrs', mrs:true, c:{H:'#eeeeee',C:'#c8283c',A:'#f4f4f4',P:'#c8283c',L:'#cfe8ff'},
+  hp:58, atk:11, def:4, spd:6, sp:3 });
+
+const pad16 = g => g.map(r => (r + '................').slice(0, 16));
+Object.assign(SPR, {
+  deer: pad16([
+"..N.N......N.N..","..NNN......NNN..","...N..KKKK..N...","...KKKNNNNKKK...","....KNNNNNNK....","....KNRNNRNK....",
+"....KNNNNNNK....",".....KNnnNK.....",".....KnRRnK.....","..KKKNNNNNNKKK..",".KNNNNNWWNNNNNK.",".KNNNNNNNNNNNNK.",
+".KNKNNNNNNNNKNK.",".KNK.KNKKNK.KNK.",".KDK.KDK.KDKKDK.","..K...K...K..K.."]),
+  bauble: pad16([
+".......KK.......","......KYYK......",".......KK.......",".....KKKKKK.....","....KRRRRRRK....","...KRWRRRRRRK...",
+"..KRWRRRRRRRRK..","..KRRERRRRERRK..","..KYYYYYYYYYYK..","..KRRRRRRRRRRK..","..KRRRKKKKRRRK..","...KRRRRRRRRK...",
+"....KRRRRRRK....",".....KKKKKK.....","................","................"]),
+  candle: pad16([
+".......Y........","......YOY.......","......YOY.......",".......K........",".....KKKKK......","....KWWWWWK.....",
+"....KWEWEWK.....","....KWWWWWK.....","....KWKKKWK.....","...KWWWWWWWK....","...KWWWWWWWK....","..KWWWWWWWWWK...",
+"..KgWWWWWWWgK...",".KggggggggggggK.",".KDDDDDDDDDDDDK.","..KKKKKKKKKKKK.."]),
+  soldier: pad16([
+"......KKKK......",".....KDDDDK.....",".....KDDDDK.....",".....KDDDDK.....","....KKYYYYKK....",".....KSSSSK.....",
+".....KESSEK.....",".....KSSSSK.....","....KbbbbbbK....","...KbYbbbbYbK...","...KbbYYYYbbK...","...KSKbbbbKSK...",
+"....KKWWWWKK....",".....KWKKWK.....",".....KDKKDK.....",".....KKKKKK....."]),
+  pup: pad16([
+"................","................","................",".....KKKKKK.....","....KWWWWWWK....","...KWWWWWWWWK...",
+"..KWWLLLLLLWWK..","..KWLELLLLELWK..","..KWLLLLLLLLWK..","..KWWLLKKLLWWK..",".KWWWWLLLLWWWWK.",".KWWWWWWWWWWWWK.",
+".KWKWWWWWWWWKWK.","..K.KWWKKWWK.K..","....KKK..KKK....","................"]),
+  ghost: pad16([
+"................",".....KKKKKK.....","....KLLLLLLK....","...KLLLLLLLLK...","...KLEELLEELK...","...KLEELLEELK...",
+"...KLLLLLLLLK...","...KLLLKKLLLK...","...KLLLKKLLLK...","...KLLLLLLLLK...","..KLLLLLLLLLLK..","..KLLLLLLLLLLK..",
+"..KLLKLLLLKLLK..","..KLK.KLLK.KLK..","..KK...KK...KK..","................"]),
+  gear: pad16([
+"......KKKK......","..KK..KYYK..KK..","..KYKKYYYYKKYK..","...KYYYYYYYYK...","..KYYYKKKKYYYK..","KKKYYKggggKYYKKK",
+"KYYYKgEggEgKYYYK","KYYYKggggggKYYYK","KYYYKgKKKKgKYYYK","KKKYYKggggKYYKKK","..KYYYKKKKYYYK..","...KYYYYYYYYK...",
+"..KYKKYYYYKKYK..","..KK..KYYK..KK..","......KKKK......","................"]),
+  wraith: pad16([
+"....R.......R...","...RXR.....RXR..","....RRR...RRR...","......RRRRR.....",".....KVVVVVK....","....KVVVVVVVK...",
+"....KVYVVVYVK...","....KVVVVVVVK...","....KVVKKKVVK...","...RKVVVVVVVKR..","..RXKVVVVVVVKXR.",".RX.KVVVVVVVK.XR",
+"....KVVKVKVVK...","....KVK.V.KVK...",".....K..V..K....","........V......."]),
+  golem: pad16([
+"................","....KKKKKKKK....","...KWRWRWRWRK...","...KRWRWRWRWK...","...KWYWRWYWRK...","...KRWRWRWRWK...",
+"..KKKKKKKKKKKK..",".KWRWRWRWRWRWRK.","KRWRWRWRWRWRWRWK","KWRWKRWRWRWKRWRK","KRWK.KWRWRK.KWRK","KKK..KRWRWK..KKK",
+".....KWRWRK.....","....KRWKKWRK....","....KWRK.KRWK...","....KKKK.KKKK..."]),
+  yeti: pad16([
+"....KKKKKKKK....","...KWWWWWWWWK...","..KWWLLLLLLWWK..","..KWLEELLEELWK..","..KWLLLLLLLLWK..","..KWLKWWWWKLWK..",
+".KWWLKKKKKKLWWK.","KWWWWLLLLLLWWWWK","KWWWWWWWWWWWWWWK","KWKWWWWWWWWWWKWK","KWKWWWWWWWWWWKWK","KLKWWWWWWWWWWKLK",
+".K.KWWWWWWWWK.K.","...KWWWKKWWWK...","..KLLLK..KLLLK..","..KKKKK..KKKKK.."]),
+  oven: pad16([
+"..KKKKKKKKKKKK..","..KggggggggggK..","..KgRgOgYgRggK..","..KKKKKKKKKKKK..","..KDDDDDDDDDDK..","..KDKKKKKKKKDK..",
+"..KDKOYOYOYKDK..","..KDKWKWKWKKDK..","..KDKOOOOOOKDK..","..KDKWKWKWKKDK..","..KDKKKKKKKKDK..","..KDDDDDDDDDDK..",
+"..KDYDDDDDDYDK..","..KDDDDDDDDDDK..","..KKKKKKKKKKKK..","...KK......KK..."]),
+  tank: pad16([
+"................","................","................","......KKKK......",".....KGGGGKKKKKK","....KGGGGGGDDDDK",
+"....KGGYGGGKKKKK","..KKKKKKKKKKKK..",".KGGGGGGGGGGGGK.",".KGYGGGGGGGGYGK.","KKKKKKKKKKKKKKKK","KDgDgDgDgDgDgDgK",
+"KgDgDgDgDgDgDgDK","KKKKKKKKKKKKKKKK","................","................"]),
+  star: pad16([
+".......KK.......","......KYYK......","......KYYK......",".....KYYYYK.....","KKKKKKYYYYKKKKKK","KYYYYYYWYYYYYYYK",
+".KYYYEYYYYEYYYK.","..KYYYYYYYYYYK..","...KYYYKKYYYK...","...KYYYYYYYYK...","..KYYYYKKYYYYK..","..KYYYK..KYYYK..",
+".KYYYK....KYYYK.",".KYYK......KYYK.","KYKK........KKYK","KK............KK"]),
+  warden: pad16([
+"...K.KKKKKK.K...","...KLKLLLLKLK...","...KLLLLLLLLK...","....KbbbbbbK....","....KLLLLLLK....","....KLELLELK....",
+"....KLLLLLLK....","...KKKbbbbKKK...","..KbbbbbbbbbbK..",".KLKbbbYYbbbKLK.",".KLKbbbbbbbbKLK.",".KgKbbbbbbbbKgK.",
+"..KKbbbbbbbbKK..","...KbbbKKbbbK...","...KDDDK.KDDDK..","...KKKKK.KKKKK.."]),
+  lich: pad16([
+"......KYK.......",".....KYOYK......","......KOK.......","....KKKKKKK.....","...KWWWWWWWK....","...KWEWWWEWK....",
+"...KWWWWWWWK....","...KWWKKKWWK....","..KVVVVVVVVVK...",".KVVWVVVVVWVVK..",".KWKVVVVVVVKWK..",".KWKVVVVVVVKWK..",
+"..KKVVVVVVVKK...","...KVVVVVVVK....","..KVVVVVVVVVK...","..KKKKKKKKKKK..."]),
+  queen: pad16([
+".....KYKYKYK....",".....KYYYYYK....","..XX.KHHHHHK.XX.",".XXXXKSSSSSKXXXX",".XLXKSESSESKXLX.","..XXKSSSSSSKXX..",
+"....KSSmmSSK....",".....KVVVVK.....","...KKVVXXVVKK...","..KSKVVVVVVKSK..","...KVVVVVVVVK...","..KVVXVVVVXVVK..",
+".KVVVVVVVVVVVVK.",".KXVVXVVVVXVVXK.","..KKKKKKKKKKKK..","................"]),
+  serpent: pad16([
+"................","..KKKKKK........",".KDDDDDDK.......","KDDODDODDK......","KDDDDDDDDK......","KDDKKKKDDK......",
+".KDRRRRDK.......","..KDDDDDK.......","...KDDDDKKKK....","....KDDDDDDDK...",".....KKKDDDDDK..","..KKKK..KDDDDK..",
+".KDDDDKKKDDDK...","KDDDDDDDDDDK....","KDDKKKDDDKK.....",".KK...KKK......."]),
+  dragon: pad16([
+"KK............KK","KGK..........KGK",".KGK..KKKK..KGK.","..KGKKLLLLKKGK..","...KKLLLLLLKK...","...KLYELLEYLK...",
+"...KLLLLLLLLK...","...KLWKKKKWLK...","..KGGLLLLLLGGK..",".KGLGGGLLGGGLGK.","KGLLKGGGGGGKLLGK","KGLK.KGGGGK.KLGK",
+".KK..KGGGGK..KK.",".....KGKKGK.....","....KGGK.KGGK...","....KKKK..KKKK.."]),
+  clock: pad16([
+"....KKKKKKKK....","...KYYYYYYYYK...","..KYKKKKKKKKYK..",".KYKWWWWWWWWKYK.",".KYKWWWKWWWWKYK.",".KYKWWWKWWWWKYK.",
+".KYKWWWKKKKWKYK.",".KYKWEWWWWEWKYK.",".KYKWWWWWWWWKYK.","..KYKKKKKKKKYK..","...KYYYYYYYYK...","....KnnnnnnK....",
+"....KnYnnYnK....","....KnnnnnnK....","...KnnnKKnnnK...","...KKKKK.KKKKK.."]),
+  scribe: pad16([
+"......KKKK......",".....KrrrrK.....","....KrrrrrrK....","...KrrKKKKrrK...","...KrKRDDRKrK...","...KrKDDDDKrK...",
+"...KrrKKKKrrK...","..KrrrrrrrrrrK..",".KrrWWWWWWWrrK..","KWKrWKKKKKWrKWK.","KWKrWWWWWWWrKWK.",".KKrWKKKKKWrKK..",
+"...KrWWWWWrK....","...KrrrrrrrK....","..KrrrrrrrrrK...","..KKKKKKKKKKK..."]),
+  titan: pad16([
+"....KKKKKKKK....","...KDDDDDDDDK...","..KDDODDDDODDK..","..KDDYDDDDYDDK..","..KDDDDDDDDDDK..","..KDDOKKKKODDK..",
+"...KDDOOOODDK...","KKKKDDDDDDDDKKKK","KDDDDODDDDODDDDK","KDODDDDOODDDDODK","KDDKDDDDDDDDKDDK","KOOKDDODDODDKOOK",
+".KK.KDDDDDDK.KK.","....KDDKKDDK....","...KDDDK.KDDDK..","...KKKKK.KKKKK.."]),
+  krampus: pad16([
+".KK..........KK.","KNnK........KnNK","KNnK........KnNK",".KNnK.KKKK.KnNK.","..KNnKDDDDKnNK..","...KKDDDDDDKK...",
+"...KDYEDDEYDK...","...KDDDDDDDDK...","...KDWKKKKWDK...","....KDKRRKDK....","..KKDDDKRKDDKK..",".KDDDDDDDDDDDDK.",
+"KgKDDDgggDDDKgK.","KgKDDDDDDDDDKgK.",".K.KDDKKKKDDK.K.","...KKKK..KKKK..."]),
+  winter: pad16([
+"..K.K.KKKK.K.K..","..KLKLWWWWLKLK..","...KWWWWWWWWK...","..KWWWWWWWWWWK..","..KWLLLLLLLLWK..","..KWLELLLLELWK..",
+"..KWLLLLLLLLWK..","..KWWWWWWWWWWK..","..KWWWWKKWWWWK..",".KbKWWWWWWWWKbK.","KbbKWWWWWWWWKbbK","KbbbKWWWWWWKbbbK",
+".KbbbKWWWWKbbbK.","..KbbbbKKbbbbK..","...KbbbbbbbbK...","....KKKKKKKK...."]),
+});
+// Regular foes for the deep floors (their numbers get scaled up per floor)
+Object.assign(MON, {
+  deer:    { name:'Rabid Reindeer', spr:'deer', hp:30, atk:11, def:3, speed:70, ai:'walker', cols:['#9a6234','#d63a3a','#ffffff'] },
+  bauble:  { name:'Cursed Bauble', spr:'bauble', hp:22, atk:10, def:2, speed:62, ai:'flyer', fly:true, cols:['#d63a3a','#f2c14e','#ffffff'] },
+  candle:  { name:'Haunted Candle', spr:'candle', hp:26, atk:11, def:2, speed:20, ai:'shooter', cols:['#f4f4f4','#ff8a1f','#f2c14e'] },
+  soldier: { name:'Toy Soldier', spr:'soldier', hp:34, atk:11, def:4, speed:42, ai:'walker', throws:true, cols:['#3b5bd6','#f2c14e','#33343d'] },
+  pup:     { name:'Yeti Pup', spr:'pup', hp:28, atk:10, def:3, speed:100, ai:'hopper', cols:['#ffffff','#bfe6ff'] },
+  ghost:   { name:'Elf Ghost', spr:'ghost', hp:24, atk:12, def:1, speed:56, ai:'flyer', fly:true, cols:['#bfe6ff','#ffffff'] },
+  gear:    { name:'Clockwork Gear', spr:'gear', hp:36, atk:12, def:5, speed:92, ai:'hopper', cols:['#f2c14e','#a7b0ba','#ffffff'] },
+  // Bosses. pats = attack patterns; pats2 = extra patterns once below half health
+  blitzen: { name:'BLITZEN THE RABID', spr:'deer', swap:{N:'#5a3a22',n:'#2a1a0e',R:'#ff2020',W:'#ffd04d'}, boss:true, scale:2, ai:'pattern', hp:1, atk:12, def:6, speed:46,
+             pats:['dash','fan'], pats2:['dash','summon'], shot:'#ff5a3a', minions:['deer'] },
+  wraith:  { name:'THE RIBBON WRAITH', spr:'wraith', boss:true, scale:2, ai:'pattern', hp:1, atk:12, def:5, speed:40, fly:true,
+             pats:['spiral','homing'], pats2:['ring'], shot:'#ff8fb1' },
+  golem:   { name:'THE CANDY GOLEM', spr:'golem', boss:true, scale:2, ai:'pattern', hp:1, atk:13, def:8, speed:26,
+             pats:['slam','rain'], pats2:['ring','slam'], shot:'#ff5a6a' },
+  yeti:    { name:'THE YETI', spr:'yeti', boss:true, scale:2, ai:'pattern', hp:1, atk:13, def:7, speed:34,
+             pats:['slam','fan'], pats2:['summon','ring'], shot:'#bfe6ff', minions:['pup'] },
+  oven:    { name:'THE OVEN MIMIC', spr:'oven', boss:true, scale:2, ai:'pattern', hp:1, atk:13, def:7, speed:28,
+             pats:['ring','spiral','rain'], pats2:['fan'], shot:'#ff8a1f' },
+  tank:    { name:'THE TOY TANK', spr:'tank', boss:true, scale:2, ai:'pattern', hp:1, atk:13, def:9, speed:30,
+             pats:['wall','fan'], pats2:['summon','rain'], shot:'#f2c14e', minions:['soldier'] },
+  star:    { name:'THE SHATTERED STAR', spr:'star', boss:true, scale:2, ai:'pattern', hp:1, atk:13, def:6, speed:44, fly:true,
+             pats:['teleport','ring','homing'], pats2:['spiral'], shot:'#ffe14d' },
+  warden:  { name:'THE FROST WARDEN', spr:'warden', boss:true, scale:2, ai:'pattern', hp:1, atk:14, def:8, speed:40,
+             pats:['fan','summon','dash'], pats2:['wall','ring'], shot:'#9fd8ff', minions:['ghost','soldier'] },
+  lich:    { name:'THE WAX LICH', spr:'lich', boss:true, scale:2, ai:'pattern', hp:1, atk:14, def:6, speed:36,
+             pats:['spiral','summon','homing','teleport'], pats2:['ring'], shot:'#7dff9a', minions:['candle','ghost'] },
+  queen:   { name:'THE SUGARPLUM QUEEN', spr:'queen', swap:{H:'#ff8fb1',S:'#f2c9a0'}, boss:true, scale:2, ai:'pattern', hp:1, atk:14, def:6, speed:48, fly:true,
+             pats:['teleport','ring','rain','homing'], pats2:['spiral','fan'], shot:'#c08af0' },
+  serpent: { name:'THE SOOT SERPENT', spr:'serpent', boss:true, scale:2, ai:'pattern', hp:1, atk:15, def:7, speed:52,
+             pats:['dash','wall','rain'], pats2:['spiral','dash'], shot:'#ff8a1f' },
+  dragon:  { name:'THE AURORA DRAGON', spr:'dragon', swap:{G:'#2ad0a0',L:'#b89cff'}, boss:true, scale:2, ai:'pattern', hp:1, atk:15, def:8, speed:46, fly:true,
+             pats:['spiral','wall','rain','dash'], pats2:['ring','homing','fan'], shot:'#7fffd4' },
+  clock:   { name:'THE MIDNIGHT CLOCK', spr:'clock', boss:true, scale:2, ai:'pattern', hp:1, atk:15, def:9, speed:34,
+             pats:['spiral','wall','ring','homing'], pats2:['teleport','rain','fan'], shot:'#ffe14d', fast:1.15 },
+  scribe:  { name:'THE NAUGHTY SCRIBE', spr:'scribe', boss:true, scale:2, ai:'pattern', hp:1, atk:15, def:8, speed:42,
+             pats:['wall','homing','summon','teleport'], pats2:['spiral','ring','rain'], shot:'#ff3b3b', minions:['ghost','candle','soldier'] },
+  titan:   { name:'THE COAL TITAN', spr:'titan', boss:true, scale:2, ai:'pattern', hp:1, atk:16, def:11, speed:30,
+             pats:['slam','ring','rain','spiral'], pats2:['wall','slam','fan'], shot:'#ff5a1f', minions:['coal'] },
+  krampus: { name:'KRAMPUS UNCHAINED', spr:'krampus', boss:true, scale:2, ai:'pattern', hp:1, atk:16, def:9, speed:50,
+             pats:['dash','spiral','rain','summon','wall'], pats2:['ring','homing','teleport','dash'], shot:'#ff3b3b', minions:['coal','snowman','ghost'], fast:1.1 },
+  winter:  { name:'OLD MAN WINTER', spr:'winter', boss:true, scale:2, ai:'pattern', hp:1, atk:17, def:10, speed:44,
+             pats:['spiral','wall','ring','homing','rain','teleport'], pats2:['dash','slam','fan','summon'], shot:'#dff3ff', minions:['ghost','gear','deer'], fast:1.2 },
+});
+FLOORS.push(...MORE_FLOORS);
+
+
 /* ---------- Canvas + sprites ---------- */
 const SC = 3;                       // screen pixels per game pixel
 const VW = 192, VH = 176, TS = 16;  // game view in game pixels
@@ -483,18 +1011,26 @@ let mode = 'title';      // title | play | dead | trans | done
 const fx = { shake:0, hitstop:0, slow:0, fade:0, fadeDir:0, redFlash:0 };
 let cam = { x:0, y:0 };
 
-function newRun(pi){
-  const p = PLAYERS[pi];
-  G = { pi, p, mv:MOVES[p.name], maxHp:p.hp, hp:p.hp, atk:p.atk, def:p.def, spd:p.spd, spMax:p.sp, sp:p.sp, cocoa:2, hasKey:false, spirit:0,
+function newRun(pi, save){
+  const p = PLAYERS[pi], ab = p.mrs ? (save ? save.ab : mrsPending) : p.name, ap = PLAYERS.find(q => q.name === ab);
+  G = { pi, p, ab, ap, lives:3, mv:MOVES[ab], maxHp:p.hp, hp:p.hp, atk:p.atk, def:p.def, spd:p.spd, spMax:p.sp, sp:p.sp, cocoa:2, hasKey:false, spirit:0,
         floor:0, x:0, y:0, hw:5, hh:8, vx:0, vy:0, kbx:0, kby:0, face:{ x:1, y:0 }, dirLR:'r', inv:0, atkCd:0, cocoaCd:0, walkT:0, moving:false,
         grid:null, layer:null, enemies:[], shots:[], eshots:[], hazards:[], allies:[], pickups:[], parts:[], texts:[], rings:[], swing:null,
-        bossDown:[false,false,false], cp:null, boss:null, msgCd:0, time:0 };
+        bossDown:[], cp:null, boss:null, msgCd:0, time:0 };
+  if (p.mrs && save) Object.assign(G, { maxHp:save.maxHp, hp:save.maxHp, atk:save.atk, def:save.def, spMax:save.spMax, sp:save.spMax, cocoa:save.cocoa, lives:save.lives });
 }
 function spawnEnemy(type, x, y, extra){
   const d = MON[type], sc = d.scale || 1, w = SPR[d.spr][0].length;
   const e = Object.assign({ type, x, y, sx:x, sy:y, hp:d.hp, maxHp:d.hp, hw:Math.round(w*sc*.32), hh:Math.round(w*sc*.55), sc,
     alive:true, t:Math.random()*3, cd:rand(.6, 1.6), vx:0, vy:0, kbx:0, kby:0, flash:0, stun:0, frozen:0, weak:false, aggro:false,
-    state:'idle', st:0, z:0, air:false, active:!d.boss, boss:!!d.boss, wander:{ x:0, y:0, t:0 }, dirLR:'l' }, extra || {});
+    state:'idle', st:0, z:0, air:false, active:!d.boss, boss:!!d.boss, wander:{ x:0, y:0, t:0 }, dirLR:'l', atk:d.atk, def:d.def, rate:1, bspd:1, alpha:1 }, extra || {});
+  if (G.p && G.p.mrs && G.floor >= 3){   // Mrs Claus deep floors: everything scales up, fast
+    const k = G.floor - 3, n = G.floor, pAtk = 11 + 3*n;
+    const hits = d.boss ? 40 + 6*k : (3 + .3*k)*(d.hp/30);
+    e.hp = e.maxHp = Math.round(hits*pAtk*.9);
+    e.atk = Math.round(((.18 + .022*k)*(58 + 12*n) + .6*(4 + n))*(d.atk/11)*(d.boss ? 1.12 : 1));
+    e.def = d.def + .5*k; e.rate = (1 + .045*k)*(d.fast || 1); e.bspd = 1 + .035*k;
+  }
   G.enemies.push(e); return e;
 }
 function loadFloor(n){
@@ -504,6 +1040,7 @@ function loadFloor(n){
   G.grid.forEach((row, y) => row.forEach((c, x) => {
     if (c === '@'){ G.x = x*TS + 8; G.y = y*TS + 13; row[x] = '.'; }
     else if (c === 'M'){ spawnEnemy(f.mons[(x*7 + y*3) % f.mons.length], x*TS + 8, y*TS + 13); row[x] = '.'; }
+    else if (c >= '1' && c <= '3'){ spawnEnemy(f.mons[(+c - 1) % f.mons.length], x*TS + 8, y*TS + 13); row[x] = '.'; }
     else if (c === 'B'){ G.boss = spawnEnemy(f.boss, x*TS + 8, y*TS + 13); row[x] = '.'; }
   }));
   G.cp = { x:G.x, y:G.y }; G.vx = G.vy = G.kbx = G.kby = 0;
@@ -548,7 +1085,7 @@ let hudCache = '';
 function updateHud(){
   if (!G) return;
   const pct = Math.max(0, G.hp/G.maxHp)*100;
-  const html = `<span class="floorname">F${G.floor+1} ${FLOORS[G.floor].short}</span>${G.spirit ? ' ✨' + G.spirit : ''}
+  const html = `<span class="floorname">F${G.floor+1} ${FLOORS[G.floor].short}</span>${G.spirit ? ' ✨' + G.spirit : ''}${G.p.mrs ? ' ❤' + G.lives : ''}
     <div class="hp"><i style="width:${pct.toFixed(1)}%"></i><b>${Math.max(0, Math.ceil(G.hp))}/${G.maxHp}</b></div>
     <span class="pips"><em>✦</em>${G.sp}/${G.spMax} ☕${G.cocoa}${G.hasKey ? ' 🗝' : ''}</span>`;
   if (html !== hudCache){ hudEl.innerHTML = html; hudCache = html; }
@@ -603,7 +1140,7 @@ function heroUpdate(dt){
   touchTiles();
   // pickups
   for (const p of G.pickups){ if (p.dead) continue; p.t += dt;
-    if (Math.hypot(p.x - G.x, p.y - G.y + 4) < 10){ p.dead = true; const h = 10; G.hp = Math.min(G.maxHp, G.hp + h); Snd.pop(); floatText(p.x, p.y - 10, '+' + h, '#7dff9a'); burst(p.x, p.y - 4, 8, ['#ff8fb1','#fff'], { min:10, max:40, g:-20 }); } }
+    if (Math.hypot(p.x - G.x, p.y - G.y + 4) < 10){ p.dead = true; const h = G.p.mrs ? Math.max(10, Math.round(G.maxHp*.08)) : 10; G.hp = Math.min(G.maxHp, G.hp + h); Snd.pop(); floatText(p.x, p.y - 10, '+' + h, '#7dff9a'); burst(p.x, p.y - 4, 8, ['#ff8fb1','#fff'], { min:10, max:40, g:-20 }); } }
   G.pickups = G.pickups.filter(p => !p.dead && p.t < 14);
 }
 function touchTiles(){
@@ -653,9 +1190,9 @@ function fireShot(s, ang, extra){
   G.shots.push(Object.assign(o, { x:G.x + Math.cos(ang)*6, y:G.y - 7 + Math.sin(ang)*6, vx:Math.cos(ang)*o.speed, vy:Math.sin(ang)*o.speed, t:0, ang, hit:new Set() }));
 }
 function heroSpecial(){
-  const p = G.p, a = aimDir(160, .2), base = Math.atan2(a.y, a.x), hx = G.x, hy = G.y - 6;
+  const p = G.ap, a = aimDir(160, .2), base = Math.atan2(a.y, a.x), hx = G.x, hy = G.y - 6;
   banner(p.spName.toUpperCase(), '', 900);
-  switch (p.name){
+  switch (G.ab){
     case 'David':
       G.swing = { t:0, dur:.32, ang:base, arc:Math.PI*2, range:34, mult:2.0, kb:230, color:'#ffe14d', hit:new Set(), spin:true };
       shake(8); Snd.swing(); Snd.tone(330,.25,'sawtooth',.05,.05,.5); break;
@@ -701,21 +1238,24 @@ function heroDown(){
   setTimeout(respawn, 1500);
 }
 function respawn(){
-  G.spirit += 1; G.atk += 1; G.maxHp += 5; G.hp = G.maxHp; G.sp = G.spMax; G.x = G.cp.x; G.y = G.cp.y; G.vx = G.vy = G.kbx = G.kby = 0; G.inv = 1.6;
+  if (G.p.mrs){ G.lives -= 1; if (G.lives <= 0){ mrsGameOver(); return; } }
+  else { G.spirit += 1; G.atk += 1; G.maxHp += 5; }
+  G.hp = G.maxHp; G.sp = G.spMax; G.x = G.cp.x; G.y = G.cp.y; G.vx = G.vy = G.kbx = G.kby = 0; G.inv = 1.6;
   G.shots = []; G.eshots = []; G.hazards = []; G.allies = []; G.swing = null;
   G.enemies = G.enemies.filter(e => !e.minion);
   for (const e of G.enemies){ if (!e.alive) continue; e.x = e.sx; e.y = e.sy; e.hp = e.maxHp; e.kbx = e.kby = 0; e.frozen = 0; e.stun = 0; e.aggro = false; e.state = 'idle'; e.st = 0; e.z = 0; e.air = false;
-    if (e.boss){ e.active = false; e.summoned = false; e.cd = 1.2; } }
+    if (e.boss){ e.active = false; e.summoned = false; e.enraged = false; e.alpha = 1; e.dashing = false; e.cd = 1.2; } }
   hideBossBar(); fx.fade = 1; fx.fadeDir = -1;
-  banner('TRY AGAIN!', 'Christmas spirit +1 · Power +1 · Max HP +5', 2200);
+  if (G.p.mrs){ banner(G.lives + (G.lives === 1 ? ' LIFE LEFT' : ' LIVES LEFT'), 'Back to the last fireplace', 2200); mrsSave(); }
+  else banner('TRY AGAIN!', 'Christmas spirit +1 · Power +1 · Max HP +5', 2200);
   mode = 'play';
 }
 
 /* ---------- Combat ---------- */
 function hitEnemy(e, mult, o={}){
-  if (!e.alive || e.air) return 0;
+  if (!e.alive || e.air || e.state === 'vanish') return 0;
   const crit = o.crit === true || (o.crit !== false && Math.random() < .08 + G.spd*.006 + (o.critBonus || 0));
-  const n = dmgCalc(G.atk, mult*(crit ? 1.6 : 1), MON[e.type].def*(o.defMul ?? 1), !!o.armor);
+  const n = dmgCalc(G.atk, mult*(crit ? 1.6 : 1), e.def*(o.defMul ?? 1), !!o.armor);
   e.hp -= n; e.flash = .12;
   const c = center(e); let dx = c.x - G.x, dy = c.y - (G.y - 6); if (o.dir){ dx = o.dir.x; dy = o.dir.y; }
   const d = Math.hypot(dx, dy) || 1, kb = (o.kb ?? 110)*(e.boss ? .12 : 1);
@@ -732,7 +1272,7 @@ function hitEnemy(e, mult, o={}){
 function killEnemy(e){
   e.alive = false; const c = center(e), d = MON[e.type];
   const cols = { nut:['#d63a3a','#f2c14e','#3b5bd6'], bat:['#8a4fd1','#a7b0ba','#bfe6ff'], gum:['#3fa34d','#a7ffb0','#ffffff'], ginger:['#9a6234','#f4f4f4','#d63a3a'],
-    snowman:['#ffffff','#bfe6ff','#ff8a1f'], coal:['#33343d','#ff8a1f','#f2c14e'], fruitcake:['#9a6234','#d63a3a','#3fa34d','#f4f4f4'], santa:['#d63a3a','#ffffff','#f2c14e','#33343d'] }[d.spr] || ['#fff'];
+    snowman:['#ffffff','#bfe6ff','#ff8a1f'], coal:['#33343d','#ff8a1f','#f2c14e'], fruitcake:['#9a6234','#d63a3a','#3fa34d','#f4f4f4'], santa:['#d63a3a','#ffffff','#f2c14e','#33343d'] }[d.spr] || d.cols || [d.shot || '#ffffff', '#ffffff', '#33343d'];
   burst(c.x, c.y, e.boss ? 90 : 22, cols, { min:30, max:e.boss ? 200 : 110, up:30, size:e.boss ? 4 : 2.6, life:e.boss ? 1.4 : .8 });
   Snd.pop();
   if (e.boss){ bossDefeated(e); return; }
@@ -747,13 +1287,15 @@ function bossDefeated(e){
   G.eshots = []; G.hazards = [];
   for (const m of G.enemies) if (m.minion && m.alive){ m.alive = false; burst(center(m).x, center(m).y, 14, ['#ffffff','#33343d'], {}); }
   ring(center(e).x, center(e).y, 8, 90, .7, '#ffe14d');
-  if (MON[e.type].final){ mode = 'done'; setTimeout(finale, 1900); return; }
+  const last = G.p.mrs ? G.floor === FLOORS.length - 1 : !!MON[e.type].final;
+  if (last){ mode = 'done'; setTimeout(G.p.mrs ? mrsVictory : finale, 1900); return; }
   G.maxHp += 12; G.atk += 3; G.def += 1; G.hp = G.maxHp; G.spMax += 1; G.sp = G.spMax;
-  setTimeout(() => banner('LEVEL UP!', 'Max HP +12 · Power +3 · +1 Special', 2600), 700);
+  const life = G.p.mrs && (G.floor === 4 || G.floor === 9) && G.lives < 5; if (life) G.lives++;
+  setTimeout(() => banner('LEVEL UP!', 'Max HP +12 · Power +3 · +1 Special' + (life ? ' · +1 LIFE' : ''), 2600), 700);
 }
 function enemyShot(e, ang, speed, mult, kind, r=4){
   const c = center(e);
-  G.eshots.push({ x:c.x + Math.cos(ang)*e.hw*.6, y:c.y + Math.sin(ang)*e.hw*.4, vx:Math.cos(ang)*speed, vy:Math.sin(ang)*speed, r, atk:(MON[e.type].atk - (e.weak ? 2 : 0))*mult, kind, t:0, life:3 });
+  G.eshots.push({ x:c.x + Math.cos(ang)*e.hw*.6, y:c.y + Math.sin(ang)*e.hw*.4, vx:Math.cos(ang)*speed*e.bspd, vy:Math.sin(ang)*speed*e.bspd, r, atk:(e.atk - (e.weak ? 2 : 0))*mult, kind, t:0, life:3 });
 }
 const toHero = e => { const c = center(e); return Math.atan2((G.y - 6) - c.y, G.x - c.x); };
 const distHero = e => Math.hypot(G.x - e.x, G.y - e.y);
@@ -813,7 +1355,7 @@ const AI = {
         let tries = 0; while (boxSolid(e.x, e.y, e.hw, e.hh, 'walk') && tries++ < 40){ e.x += (e.from.x - e.x)*.1; e.y += (e.from.y - e.y)*.1; }
         shake(12); Snd.boom(); ring(e.x, e.y - 2, 6, 34, .4, '#ffcf9a');
         burst(e.x, e.y, 30, ['#9a6234','#d63a3a','#3fa34d','#f4f4f4'], { min:30, max:110, up:50, size:3 });
-        if (Math.hypot(G.x - e.x, G.y - e.y) < 30) hurtHero(MON.cake.atk*1.4, e.x, e.y);
+        if (Math.hypot(G.x - e.x, G.y - e.y) < 30) hurtHero(e.atk*1.4, e.x, e.y);
         const n = ph2 ? 12 : 8; for (let i = 0; i < n; i++) enemyShot(e, i*Math.PI*2/n + e.t, 78, .8, 'crumb', 4);
       }
       return;
@@ -846,7 +1388,7 @@ const AI = {
           const total = ph2 ? 5 : 3;
           if (e.n < total){
             const tx = G.x + (e.n ? rand(-36, 36) : G.vx*.4), ty = G.y + (e.n ? rand(-30, 30) : G.vy*.4);
-            const c = center(e); G.hazards.push({ x:tx, y:ty, r:18, t:0, delay:1.0, atk:MON.santa.atk*1.3, kind:'present', fx:c.x, fy:c.y - 10, col:['#3fa34d','#3b5bd6','#8a4fd1','#d63a3a'][e.n % 4] });
+            const c = center(e); G.hazards.push({ x:tx, y:ty, r:18, t:0, delay:1.0, atk:e.atk*1.3, kind:'present', fx:c.x, fy:c.y - 10, col:['#3fa34d','#3b5bd6','#8a4fd1','#d63a3a'][e.n % 4] });
             e.n++; e.st = .22; Snd.tone(600,.06,'triangle',.03);
           } else { e.state = 'walk'; e.st = (ph2 ? .7 : 1.1) + .6; }
         }
@@ -872,6 +1414,218 @@ const AI = {
     }
   },
 };
+
+/* ---------- Deep-floor boss patterns (Mrs Claus floors) ---------- */
+function bossOrb(e, ang, speed, mult, r=4, extra){
+  enemyShot(e, ang, speed, mult, 'orb', r);
+  const s = G.eshots[G.eshots.length - 1]; s.col = MON[e.type].shot || '#ffffff'; if (extra) Object.assign(s, extra); return s;
+}
+function summonMinions(e, n){
+  const d = MON[e.type], pool = d.minions || FLOORS[G.floor].mons;
+  let alive = G.enemies.filter(m => m.alive && m.minion).length;
+  for (let i = 0; i < n && alive < 5; i++, alive++){
+    const a = rand(0, Math.PI*2), m = spawnEnemy(pool[(Math.random()*pool.length)|0], e.x + Math.cos(a)*30, e.y + Math.sin(a)*22, { minion:true, aggro:true });
+    if (boxSolid(m.x, m.y, m.hw, m.hh, MON[m.type].fly ? 'fly' : 'walk')){ m.x = e.x; m.y = e.y; }
+    burst(m.x, m.y - 6, 16, ['#ffffff', '#33343d', d.shot || '#ffffff'], { min:20, max:70 });
+  }
+  Snd.tone(180, .3, 'sawtooth', .05, 0, 1.6);
+}
+function patWalk(e, ph2){ e.state = 'walk'; e.st = (ph2 ? .5 : .85) + rand(0, .45); e.dashing = false; }
+function patStart(e, p){
+  e.n = 0; e.st = 0; e.tick = 0;
+  if (p === 'dash'){ e.state = 'windup'; e.st = .75; }
+  else if (p === 'slam'){ e.state = 'crouch'; e.st = .45; }
+  else if (p === 'teleport'){ e.state = 'vanish'; e.st = .4; Snd.tone(900, .3, 'triangle', .04, 0, .3); }
+  else { e.state = 'p'; e.pat = p; }
+}
+AI.pattern = function(e, dt, d){
+  if (!e.active) return;
+  const ph2 = e.hp < e.maxHp/2, who = d.fly ? 'fly' : 'walk';
+  if (ph2 && !e.enraged){ e.enraged = true; shake(10); Snd.boss(); banner(d.name, 'IS ENRAGED!', 1400); if (d.minions) summonMinions(e, 2); }
+  switch (e.state){
+    case 'idle': patWalk(e, ph2); break;
+    case 'walk': {
+      const dist = distHero(e), a = toHero(e);
+      if (dist > 52) stepToward(e, a, d.speed, dt, who); else stepToward(e, a + Math.PI/2*(e.side || 1), d.speed*.7, dt, who);
+      if (Math.random() < dt*.5) e.side = -(e.side || 1);
+      e.st -= dt;
+      if (e.st <= 0){ const pool = ph2 && d.pats2 ? d.pats.concat(d.pats2) : d.pats;
+        let opts = pool.filter(p => p !== e.last); if (!opts.length) opts = pool;
+        e.last = opts[(Math.random()*opts.length)|0]; patStart(e, e.last); }
+      break; }
+    case 'p': {
+      e.tick -= dt; e.st += dt; const c = center(e);
+      switch (e.pat){
+        case 'fan': if (e.tick <= 0){ if (e.n >= (ph2 ? 3 : 2)) { patWalk(e, ph2); break; }
+            e.tick = .5; e.n++; const k = ph2 ? 7 : 5, base = toHero(e); for (let i = 0; i < k; i++) bossOrb(e, base + (i - (k - 1)/2)*.2, 100, 1); Snd.shoot(); } break;
+        case 'ring': if (e.tick <= 0){ if (e.n >= (ph2 ? 3 : 2)) { patWalk(e, ph2); break; }
+            e.tick = .55; const k = ph2 ? 16 : 12, off = e.n*Math.PI/k; e.n++; for (let i = 0; i < k; i++) bossOrb(e, off + i*Math.PI*2/k, 80, .9); ring(c.x, c.y, 4, 30, .3, MON[e.type].shot || '#fff'); Snd.boom(); } break;
+        case 'spiral': if (e.tick <= 0){ e.tick = .1; const k = ph2 ? 4 : 3; e.spin = (e.spin || 0) + .33;
+            for (let i = 0; i < k; i++) bossOrb(e, e.spin + i*Math.PI*2/k, 72, .8); Snd.tone(300, .04, 'square', .02); }
+          if (e.st >= 2) patWalk(e, ph2); break;
+        case 'rain': if (e.tick <= 0){ if (e.n >= (ph2 ? 6 : 4)) { patWalk(e, ph2); break; }
+            e.tick = .22; const tx = G.x + (e.n ? rand(-34, 34) : G.vx*.4), ty = G.y + (e.n ? rand(-28, 28) : G.vy*.4); e.n++;
+            G.hazards.push({ x:tx, y:ty, r:16, t:0, delay:.9/Math.min(1.5, e.rate), atk:e.atk*1.2, kind:'drop', col:MON[e.type].shot || '#fff' }); Snd.tone(620, .05, 'triangle', .03); } break;
+        case 'summon': if (!e.n){ e.n = 1; summonMinions(e, ph2 ? 3 : 2); } if (e.st > .6) patWalk(e, ph2); break;
+        case 'wall': if (e.tick <= 0){ if (e.n >= (ph2 ? 2 : 1)) { patWalk(e, ph2); break; }
+            e.tick = .75; e.n++; const a = toHero(e), px2 = -Math.sin(a), py2 = Math.cos(a), k = 13, gap = 3 + ((Math.random()*7)|0), sp = 66*e.bspd;
+            for (let i = 0; i < k; i++){ if (i === gap || i === gap + 1) continue; const o = (i - (k - 1)/2)*10;
+              G.eshots.push({ x:c.x + px2*o, y:c.y + py2*o, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, r:4, atk:e.atk, kind:'orb', col:MON[e.type].shot || '#fff', t:0, life:4.5 }); }
+            Snd.boom(); } break;
+        case 'homing': if (e.tick <= 0){ if (e.n >= (ph2 ? 5 : 3)) { patWalk(e, ph2); break; }
+            e.tick = .28; e.n++; bossOrb(e, toHero(e) + rand(-.7, .7), 62, .9, 5, { home:1.8, turn:2.4, life:4 }); Snd.tone(1100, .06, 'triangle', .03, 0, .6); } break;
+        default: patWalk(e, ph2);
+      }
+      break; }
+    case 'windup': e.st -= dt; if (e.st > .3) e.dashA = toHero(e); if (e.st <= 0){ e.state = 'dash'; e.st = .8; Snd.tone(150, .4, 'sawtooth', .06, 0, 2); } break;
+    case 'dash': {
+      e.st -= dt; e.dashing = true;
+      const r = stepToward(e, e.dashA, 240, dt, who);
+      if (Math.random() < .6) burst(e.x, e.y - 4, 2, ['#ffffff', MON[e.type].shot || '#fff'], { min:5, max:20, g:-20 });
+      if (r.hx || r.hy || e.st <= 0){
+        e.dashing = false; const wall = r.hx || r.hy;
+        if (wall){ shake(9); Snd.boom(); burst(e.x, e.y - 12, 20, ['#ffffff', MON[e.type].shot || '#fff'], { min:30, max:110, up:30 });
+          if (ph2) for (let i = 0; i < 8; i++) bossOrb(e, i*Math.PI/4, 76, .8); }
+        e.n++; if (e.n < (ph2 ? 2 : 1)){ e.state = 'windup'; e.st = .45; } else { e.state = 'stun'; e.st = wall ? .6 : .25; }
+      }
+      break; }
+    case 'stun': e.st -= dt; if (e.st <= 0) patWalk(e, ph2); break;
+    case 'crouch': e.st -= dt; if (e.st <= 0){ e.state = 'air'; e.st = 0; e.air = true; e.from = { x:e.x, y:e.y }; e.to = { x:G.x, y:G.y }; } break;
+    case 'air': {
+      const dur = .95; e.st += dt; const t = Math.min(1, e.st/dur);
+      if (e.st < .5) e.to = { x:G.x, y:G.y };
+      e.x = e.from.x + (e.to.x - e.from.x)*t; e.y = e.from.y + (e.to.y - e.from.y)*t; e.z = Math.sin(t*Math.PI)*48;
+      if (t >= 1){
+        e.air = false; e.z = 0;
+        let tries = 0; while (boxSolid(e.x, e.y, e.hw, e.hh, 'walk') && tries++ < 40){ e.x += (e.from.x - e.x)*.1; e.y += (e.from.y - e.y)*.1; }
+        shake(12); Snd.boom(); ring(e.x, e.y - 2, 6, 36, .4, MON[e.type].shot || '#fff');
+        burst(e.x, e.y, 28, ['#ffffff', MON[e.type].shot || '#fff', '#33343d'], { min:30, max:110, up:50, size:3 });
+        if (Math.hypot(G.x - e.x, G.y - e.y) < 32) hurtHero(e.atk*1.4, e.x, e.y);
+        const k = ph2 ? 14 : 10; for (let i = 0; i < k; i++) bossOrb(e, i*Math.PI*2/k + e.t, 78, .8);
+        patWalk(e, ph2);
+      }
+      break; }
+    case 'vanish': e.st -= dt; e.alpha = Math.max(.08, e.st/.4);
+      if (e.st <= 0){
+        for (let i = 0; i < 24; i++){ const a = rand(0, Math.PI*2), r = rand(56, 86), x = G.x + Math.cos(a)*r, y = G.y + Math.sin(a)*r;
+          if (!boxSolid(x, y, e.hw, e.hh, 'walk')){ e.x = x; e.y = y; break; } }
+        e.state = 'appear'; e.st = .35; burst(e.x, e.y - 12, 18, ['#ffffff', MON[e.type].shot || '#fff'], { min:10, max:60, glow:true });
+      } break;
+    case 'appear': e.st -= dt; e.alpha = Math.min(1, 1 - e.st/.35);
+      if (e.st <= 0){ e.alpha = 1; const k = ph2 ? 14 : 10; for (let i = 0; i < k; i++) bossOrb(e, i*Math.PI*2/k, 74, .85); Snd.boom(); patWalk(e, ph2); } break;
+    default: patWalk(e, ph2);
+  }
+};
+function glowOf(hex){ const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},A)`; }
+
+/* ---------- Deep-floor decorations + weather ---------- */
+function drawDeco(P, x, sx, sy, v, th, h){
+  switch (th.deco){
+    case 'hay': P(sx + 1, sy + 6, 14, 9, '#1a1c2c'); P(sx + 2, sy + 7, 12, 7, '#e0b84a'); P(sx + 2, sy + 9, 12, 1, '#b8902a'); P(sx + 2, sy + 12, 12, 1, '#b8902a');
+      P(sx + 5, sy + 7, 1, 7, '#8a5a2b'); P(sx + 10, sy + 7, 1, 7, '#8a5a2b'); P(sx + 3, sy + 5, 1, 2, '#f2d27a'); P(sx + 8, sy + 4, 1, 3, '#f2d27a'); P(sx + 12, sy + 5, 1, 2, '#f2d27a'); break;
+    case 'crate': P(sx + 2, sy + 4, 12, 11, '#1a1c2c'); P(sx + 3, sy + 5, 10, 9, '#9a6a3a'); P(sx + 3, sy + 5, 10, 1, '#c08a50');
+      for (let i = 0; i < 8; i++){ P(sx + 4 + i, sy + 6 + i, 1, 1, '#6e4420'); P(sx + 11 - i, sy + 6 + i, 1, 1, '#6e4420'); } break;
+    case 'barrel': P(sx + 3, sy + 3, 10, 12, '#1a1c2c'); P(sx + 4, sy + 4, 8, 10, '#8a5a2b'); P(sx + 3, sy + 6, 10, 1, '#a7b0ba'); P(sx + 3, sy + 11, 10, 1, '#a7b0ba'); P(sx + 5, sy + 4, 1, 10, '#a8723c'); break;
+    case 'candle': P(sx + 7, sy + 8, 2, 7, '#a7b0ba'); P(sx + 3, sy + 13, 10, 2, '#7a7f88'); P(sx + 3, sy + 8, 10, 1, '#a7b0ba');
+      for (const cx of [3, 7, 11]){ P(sx + cx, sy + 4, 2, 4, '#f4f4f4'); P(sx + cx, sy + 2, 2, 2, '#7dff9a'); } break;
+    case 'gear': P(sx + 3, sy + 3, 10, 10, '#1a1c2c'); P(sx + 4, sy + 4, 8, 8, '#d0ac5c'); P(sx + 6, sy + 6, 4, 4, '#1a1c2c');
+      P(sx + 7, sy + 1, 2, 3, '#d0ac5c'); P(sx + 7, sy + 12, 2, 3, '#d0ac5c'); P(sx + 1, sy + 7, 3, 2, '#d0ac5c'); P(sx + 12, sy + 7, 3, 2, '#d0ac5c'); break;
+    case 'book': { P(sx + 1, sy + 1, 14, 15, '#1a1c2c'); P(sx + 2, sy + 2, 12, 13, '#4a2a14'); const cols = ['#c8283c','#3b5bd6','#3fa34d','#f2c14e','#8a4fd1'];
+      for (let r = 0; r < 2; r++) for (let i = 0; i < 5; i++) P(sx + 3 + i*2, sy + 3 + r*6, 2, 5, cols[(h + i + r*2) % 5]); P(sx + 2, sy + 8, 12, 1, '#2a1a0c'); break; }
+    case 'coal': P(sx + 2, sy + 8, 12, 7, '#111111'); P(sx + 4, sy + 6, 8, 3, '#111111'); P(sx + 3, sy + 9, 3, 2, '#33343d'); P(sx + 9, sy + 8, 3, 2, '#33343d');
+      P(sx + 6, sy + 11, 2, 1, '#ff8a1f'); P(sx + 11, sy + 12, 1, 1, '#ff5a1f'); break;
+    case 'oven': P(sx + 1, sy + 2, 14, 13, '#1a1c2c'); P(sx + 2, sy + 3, 12, 11, '#9a3b2a'); P(sx + 4, sy + 7, 8, 6, '#1a1c2c'); P(sx + 5, sy + 9, 6, 3, '#ff8a1f'); P(sx + 6, sy + 10, 4, 1, '#ffe14d'); P(sx + 2, sy + 3, 12, 2, '#c8c8c8'); break;
+    default: return false;
+  }
+  return true;
+}
+function drawWeather(kind, n, ox, oy){
+  if (kind === 'snow'){ drawSnow(n, ox, oy); return; }
+  if (kind === 'none' || !n) return;
+  const W = cv.width, H = cv.height;
+  for (let i = 0; i < n; i++){ const k = flakes[i];
+    let x = ((k.x*W - ox*(.3 + k.z*.5)) % W + W) % W, y;
+    if (kind === 'embers'){ y = (1 - ((k.y + T*.0006*k.s) % 1))*H; ctx.globalAlpha = .25 + k.z*.3; px(x, y, 3, 3, '#ffb070'); continue; }
+    const fall = kind === 'dust' ? .00012 : kind === 'ash' ? .0005 : .0009;
+    y = (((k.y + T*fall*(.5 + k.s)) % 1)*H - oy*(.3 + k.z*.5)) % H; if (y < 0) y += H;
+    x += Math.sin((T + i*30)/50)*8;
+    if (kind === 'dust'){ ctx.globalAlpha = .12 + k.z*.15; px(x, y, 3, 3, '#e8dcc0'); }
+    else if (kind === 'ash'){ ctx.globalAlpha = .25 + k.z*.3; px(x, y, 3, 3, '#8a8a8a'); }
+    else if (kind === 'confetti'){ ctx.globalAlpha = .55; px(x, y, 4, 3, ['#d63a3a','#f2c14e','#3fa34d','#3b5bd6','#ff8fb1'][i % 5]); }
+    else if (kind === 'petals'){ ctx.globalAlpha = .5; px(x, y, 4, 3, i % 3 ? '#ff8fb1' : '#ffffff'); }
+  }
+  ctx.globalAlpha = 1;
+}
+
+/* ---------- Mrs Claus run: save, game over, victory ---------- */
+const MRS_SAVE = 'mrs-claus-run-v1', MRS_BEST = 'mrs-claus-best-v1';
+let mrsPending = null;
+function mrsLoad(){ try { const s = JSON.parse(localStorage.getItem(MRS_SAVE) || 'null'); return s && s.floor < FLOORS.length && MOVES[s.ab] ? s : null; } catch(e){ return null; } }
+function mrsSave(){ if (!G || !G.p.mrs) return; try { localStorage.setItem(MRS_SAVE, JSON.stringify({ floor:G.floor, ab:G.ab, maxHp:G.maxHp, atk:G.atk, def:G.def, spMax:G.spMax, cocoa:G.cocoa, lives:G.lives })); } catch(e){} }
+function mrsClear(){ try { localStorage.removeItem(MRS_SAVE); } catch(e){} }
+function mrsBest(){ try { return +localStorage.getItem(MRS_BEST) || 0; } catch(e){ return 0; } }
+function mrsRecord(f){ try { if (f > mrsBest()) localStorage.setItem(MRS_BEST, String(f)); } catch(e){} }
+function mrsGameOver(){
+  mode = 'done'; mrsRecord(G.floor + 1); mrsClear(); showHud(false); hideBossBar(); Snd.lose();
+  revealEl.innerHTML = `<h1 class="title">MRS CLAUS<span>has fallen</span></h1>
+    <div class="scroll">She made it to <b class="warn">Floor ${G.floor + 1}</b> of ${FLOORS.length}<br>with ${esc(G.ap.name)}'s powers.<br><br>🏆 Best on this device: Floor ${mrsBest()}</div>
+    <button class="big ghost" type="button" onclick="location.reload()">Back to start</button>`;
+  revealEl.classList.add('show');
+}
+function mrsVictory(){
+  mrsRecord(FLOORS.length); mrsClear(); showHud(false); hideBossBar(); Snd.jingle();
+  revealEl.innerHTML = `<h1 class="title">IMPOSSIBLE!<span>Mrs Claus saved Christmas</span></h1>
+    <div class="scroll">Old Man Winter melts away.<br>All ${FLOORS.length} floors cleared<br>with ${esc(G.ap.name)}'s powers.<br><br><div class="who">LEGEND</div>Nobody was supposed to do this.</div>
+    <button class="big ghost" type="button" onclick="location.reload()">Back to start</button>`;
+  revealEl.classList.add('show');
+}
+function showMrs(){
+  const save = mrsLoad(), best = mrsBest();
+  confirmEl.innerHTML = `
+    <h1 class="title">MRS CLAUS<span>The Endless Dungeon</span></h1>
+    <div class="panel">Not part of the Secret Santa draw. She beats Evil Santa and keeps going: <b>${FLOORS.length - 3} more floors</b>, each with its own boss, each much harder than the last.<br><br>
+      ❤ <b>3 lives</b> for the whole run (+1 after floors 5 and 10). Progress saves on this device at every floor.${best ? `<br><br>🏆 Best on this device: <b>Floor ${best}</b>` : ''}</div>
+    <div class="panel" id="shuf"></div>
+    <div id="mrsBtns"></div>
+    <button class="big ghost" id="back" type="button">◀ Back</button>`;
+  confirmEl.classList.add('show'); confirmEl.scrollTop = 0;
+  document.getElementById('back').onclick = () => confirmEl.classList.remove('show');
+  const btns = document.getElementById('mrsBtns');
+  if (save){
+    showAbility(save.ab, `Saved run: <b>Floor ${save.floor + 1}</b> · ❤${save.lives}`);
+    btns.innerHTML = `<button class="big" id="cont" type="button">▶ CONTINUE FROM FLOOR ${save.floor + 1}</button><button class="big red" id="fresh" type="button">↻ NEW RUN (new shuffle)</button>`;
+    document.getElementById('cont').onclick = () => startGame(MRS, save);
+    document.getElementById('fresh').onclick = () => { mrsClear(); mrsPending = null; showMrs(); };
+  } else if (mrsPending){
+    showAbility(mrsPending, 'Mrs Claus shuffled everyone\'s powers and got...');
+    btns.innerHTML = `<button class="big" id="go" type="button">⚔ ENTER THE DUNGEON</button>`;
+    document.getElementById('go').onclick = () => startGame(MRS, null);
+  } else shuffleAbilities(btns);
+}
+function showAbility(ab, lead){
+  const i = PLAYERS.findIndex(p => p.name === ab), p = PLAYERS[i];
+  const box = document.getElementById('shuf');
+  box.innerHTML = `<div class="hero-row"><div id="shufArt"></div><div>${lead}<br><b>${esc(p.name.toUpperCase())}'S POWERS</b><br>⚔ ${esc(p.atkName)} (${esc(MOVES[ab].label)})<br>✦ ${esc(p.spName)}: ${esc(p.spDesc)}</div></div>`;
+  const c = bigSprite(heroSprites[i][0].r); c.style.cssText = 'width:96px;height:96px;image-rendering:pixelated;background:#0d1b2a;border:3px solid #f2c14e;border-radius:6px;display:block';
+  document.getElementById('shufArt').appendChild(c);
+}
+function shuffleAbilities(btns){
+  const box = document.getElementById('shuf'), pool = PLAYERS.filter(p => !p.mrs).map(p => p.name);
+  const pick = pool[(Math.random()*pool.length)|0];
+  box.innerHTML = `<div class="hero-row"><canvas id="shufCv" width="16" height="16" style="width:96px;height:96px;image-rendering:pixelated;background:#0d1b2a;border:3px solid #33506f;border-radius:6px"></canvas><div>Mrs Claus is shuffling everyone's powers...<br><br><b id="shufName">?</b></div></div>`;
+  const cvs = document.getElementById('shufCv').getContext('2d'), nm = document.getElementById('shufName');
+  let step = 0, idx = 0; const total = 22 + pool.indexOf(pick) + pool.length*(1 + (Math.random()*2|0));
+  const tick = () => {
+    idx = step % pool.length; const hi = PLAYERS.findIndex(p => p.name === pool[idx]);
+    cvs.clearRect(0, 0, 16, 16); cvs.drawImage(heroSprites[hi][0].r, 0, 0); nm.textContent = pool[idx].toUpperCase(); Snd.tone(500 + (step % 8)*60, .04, 'square', .03);
+    step++;
+    if (pool[idx] === pick && step >= total){ mrsPending = pick; Snd.win(); showAbility(pick, 'Mrs Claus shuffled everyone\'s powers and got...');
+      btns.innerHTML = `<button class="big" id="go" type="button">⚔ ENTER THE DUNGEON</button>`; document.getElementById('go').onclick = () => startGame(MRS, null); return; }
+    setTimeout(tick, 50 + Math.max(0, step - total + 12)*25);
+  };
+  Snd.unlock(); tick();
+}
+
 function enemyUpdate(e, dt){
   if (!e.alive) return;
   e.t += dt; e.flash = Math.max(0, e.flash - dt);
@@ -879,9 +1633,9 @@ function enemyUpdate(e, dt){
   if (e.boss && !e.active && distHero(e) < 104) activateBoss(e);
   if (e.frozen > 0) e.frozen -= dt;
   else if (e.stun > 0) e.stun -= dt;
-  else AI[d.ai](e, dt, d);
+  else AI[d.ai](e, dt*e.rate, d);
   if (e.kbx || e.kby){ const r = moveBody(e, e.kbx*dt, e.kby*dt, who); if (r.hx) e.kbx = 0; if (r.hy) e.kby = 0; const kd = Math.exp(-9*dt); e.kbx *= kd; e.kby *= kd; if (Math.abs(e.kbx) + Math.abs(e.kby) < 2) e.kbx = e.kby = 0; }
-  if (!e.air && e.frozen <= 0 && mode === 'play' && overlap(e, G)) hurtHero((d.atk - (e.weak ? 2 : 0))*(e.dashing ? 1.6 : 1), e.x, e.y - e.hh/2);
+  if (!e.air && e.state !== 'vanish' && e.frozen <= 0 && mode === 'play' && overlap(e, G)) hurtHero((e.atk - (e.weak ? 2 : 0))*(e.dashing ? 1.6 : 1), e.x, e.y - e.hh/2);
 }
 function shotsUpdate(dt){
   for (const s of G.shots){
@@ -900,6 +1654,8 @@ function shotsUpdate(dt){
   }
   G.shots = G.shots.filter(s => !s.dead);
   for (const s of G.eshots){
+    if (s.home > 0){ s.home -= dt; const cur = Math.atan2(s.vy, s.vx); let dd = Math.atan2((G.y - 6) - s.y, G.x - s.x) - cur;
+      while (dd > Math.PI) dd -= Math.PI*2; while (dd < -Math.PI) dd += Math.PI*2; const na = cur + clamp(dd, -s.turn*dt, s.turn*dt), sp = Math.hypot(s.vx, s.vy); s.vx = Math.cos(na)*sp; s.vy = Math.sin(na)*sp; }
     s.t += dt; s.x += s.vx*dt; s.y += s.vy*dt;
     if (s.t > s.life || solidTile(tileAt(Math.floor(s.x/TS), Math.floor(s.y/TS)), 'shot')){ s.dead = true; burst(s.x, s.y, 4, ['#ffffff', '#888'], { min:10, max:40 }); continue; }
     if (mode === 'play' && Math.abs(s.x - G.x) < G.hw + s.r - 1 && s.y > G.y - G.hh - s.r && s.y < G.y + s.r - 2){ s.dead = true; hurtHero(s.atk, s.x - s.vx*.05, s.y - s.vy*.05); }
@@ -941,8 +1697,8 @@ function effectsUpdate(dt){
   for (const r of G.rings) r.t += dt; G.rings = G.rings.filter(r => r.t < r.dur);
   // ambient embers from fireplaces
   if (Math.random() < .3) for (let gy = 0; gy < G.grid.length; gy++) for (let gx = 0; gx < G.grid[0].length; gx++) if (G.grid[gy][gx] === 'F' && Math.random() < .3){
-    const ice = FLOORS[G.floor].theme === 'ice';
-    G.parts.push({ x:gx*TS + rand(5, 11), y:gy*TS + 9, vx:rand(-6, 6), vy:rand(-26, -12), g:-6, drag:1, life:rand(.6, 1.2), t:0, c:ice ? '#7fd3ff' : '#ffb347', s:1, glow:true });
+    const fc = FLAME[THEMES[FLOORS[G.floor].theme].flame];
+    G.parts.push({ x:gx*TS + rand(5, 11), y:gy*TS + 9, vx:rand(-6, 6), vy:rand(-26, -12), g:-6, drag:1, life:rand(.6, 1.2), t:0, c:fc[3], s:1, glow:true });
   }
 }
 
@@ -950,7 +1706,8 @@ function nextFloor(){
   mode = 'trans'; Snd.stairs(); fx.fade = 0; fx.fadeDir = 1;
   setTimeout(() => {
     loadFloor(G.floor + 1); updateHud(); fx.fadeDir = -1; mode = 'play'; G.inv = 1;
-    banner('FLOOR ' + (G.floor + 1), FLOORS[G.floor].name, 2200);
+    if (G.p.mrs) mrsSave();
+    banner('FLOOR ' + (G.floor + 1) + (G.p.mrs ? ' / ' + FLOORS.length : ''), FLOORS[G.floor].name, 2200);
   }, 520);
 }
 
@@ -971,6 +1728,7 @@ async function finale(){
   document.getElementById('unseal').onclick = unseal;
 }
 async function unseal(){
+  if (G.p.mrs) return;
   const btn = document.getElementById('unseal'); btn.disabled = true; btn.textContent = 'Unrolling...';
   let res;
   try { res = await Lock.claim(G.p.name); }
@@ -1014,6 +1772,7 @@ async function loadTitle(){
   cards.innerHTML = '<div class="grid"></div><p class="sub" style="margin-top:18px">Choose YOUR name. Each hero fights differently!</p>';
   const grid = cards.querySelector('.grid');
   PLAYERS.forEach((p, i) => {
+    if (p.mrs) return;
     const b = document.createElement('button'); b.type = 'button'; b.className = 'card';
     const isLocked = locked.includes(p.name);
     b.appendChild(bigSprite(heroSprites[i][0].r));
@@ -1023,6 +1782,14 @@ async function loadTitle(){
     else b.onclick = () => { Snd.unlock(); Snd.blip(); showConfirm(i); };
     grid.appendChild(b);
   });
+  // Mrs Claus: a bonus hero who is not in the draw and never locks
+  const mb = document.createElement('button'); mb.type = 'button'; mb.className = 'card mrscard';
+  mb.appendChild(bigSprite(heroSprites[MRS][0].r));
+  const best = mrsBest(), save = mrsLoad();
+  const info = document.createElement('div');
+  info.innerHTML = `<div class="nm">MRS CLAUS</div><div class="cl">Bonus hero · not in the draw<br>${FLOORS.length} floors · steals a random hero's powers</div><div class="tag">${save ? '▶ Saved run on floor ' + (save.floor + 1) : best ? '🏆 Best: floor ' + best : 'Can anyone reach floor ' + FLOORS.length + '?'}</div>`;
+  mb.appendChild(info); mb.onclick = () => { Snd.unlock(); Snd.blip(); showMrs(); };
+  grid.after(mb);
 }
 function showConfirm(i){
   const p = PLAYERS[i], mv = MOVES[p.name];
@@ -1040,14 +1807,18 @@ function showConfirm(i){
   document.getElementById('back').onclick = () => confirmEl.classList.remove('show');
   document.getElementById('go').onclick = () => startGame(i);
 }
-async function startGame(i){
+async function startGame(i, save){
   Snd.unlock(); Snd.stairs();
-  // Double-check the lock before starting
-  try { const l = await Lock.list(); if (l.includes(PLAYERS[i].name)){ confirmEl.classList.remove('show'); loadTitle(); return; } } catch(e){}
-  newRun(i); loadFloor(0);
+  const mrs = !!PLAYERS[i].mrs;
+  // Double-check the lock before starting (Mrs Claus has no lock)
+  if (!mrs) try { const l = await Lock.list(); if (l.includes(PLAYERS[i].name)){ confirmEl.classList.remove('show'); loadTitle(); return; } } catch(e){}
+  if (mrs && !save && !mrsPending) return;
+  newRun(i, mrs ? save : null); loadFloor(mrs && save ? save.floor : 0);
+  if (mrs) mrsSave();
   confirmEl.classList.remove('show'); titleEl.classList.remove('show');
   mode = 'play'; showHud(true); updateHud(); fx.fade = 1; fx.fadeDir = -1;
-  banner('FLOOR 1', FLOORS[0].name, 2200);
+  banner('FLOOR ' + (G.floor + 1) + (mrs ? ' / ' + FLOORS.length : ''), FLOORS[G.floor].name, 2200);
+  if (mrs) mrsPending = null;
 }
 
 /* ---------- Rendering ---------- */
@@ -1058,6 +1829,41 @@ const THEMES = {
   caverns: { floor:'#d9a066', floor2:'#c4874a', floor3:'#e6b27a', top:'#6e4228', face:'#5a3420', face2:'#432616', trim:'#fff3e0', amb:'rgba(30,12,4,0.48)' },
   ice:     { floor:'#9fb8d6', floor2:'#87a2c4', floor3:'#b4cae4', top:'#2c4f8f', face:'#1f3a6e', face2:'#162b54', trim:'#bfe6ff', amb:'rgba(4,10,36,0.55)' },
 };
+// Themes for the deep floors. tex: planks | speckle | tiles. deco: what 'D' looks like.
+const LIQ = {
+  molasses:{ a:'#4a2a14', b:'#7a4520', c:'#a86a34', glow:'rgba(255,120,40,A)' },
+  water:   { a:'#1f4f8f', b:'#3a7ac0', c:'#7fbfff', glow:null },
+  chasm:   { a:'#0e080e', b:'#22142a', c:'#3a2440', glow:null },
+  cocoa:   { a:'#6a2a08', b:'#c85a14', c:'#ff8a1f', glow:'rgba(255,120,40,A)' },
+  syrup:   { a:'#4a1f6a', b:'#8a4fd1', c:'#c08af0', glow:'rgba(180,110,255,A)' },
+  void:    { a:'#05051a', b:'#2a1f6a', c:'#7fffd4', glow:'rgba(120,255,220,A)' },
+  lava:    { a:'#7a1404', b:'#ff5a1f', c:'#ffd04d', glow:'rgba(255,90,30,A)' },
+};
+Object.assign(THEMES.workshop, { tex:'planks', deco:'presents', liq:'molasses', flame:'orange', weather:['snow',30] });
+Object.assign(THEMES.caverns,  { tex:'speckle', deco:'candy', liq:'molasses', flame:'orange', weather:['embers',18] });
+Object.assign(THEMES.ice,      { tex:'tiles', deco:'crystal', liq:'water', flame:'blue', weather:['snow',60] });
+Object.assign(THEMES, {
+  stables:  { tex:'planks', deco:'hay', liq:'water', flame:'orange', weather:['dust',14], floor:'#8f6a3a', floor2:'#7a5830', floor3:'#a37a46', top:'#5a3a22', face:'#6e4a2c', face2:'#4a301c', trim:'#d9b44a', amb:'rgba(20,10,4,0.45)' },
+  mill:     { tex:'planks', deco:'presents', liq:'molasses', flame:'orange', weather:['confetti',30], floor:'#c79bb8', floor2:'#a87d9a', floor3:'#d8b0c8', top:'#5a2a5a', face:'#7a3a7a', face2:'#552255', trim:'#f2c14e', amb:'rgba(20,4,24,0.42)' },
+  mines:    { tex:'speckle', deco:'candy', liq:'chasm', flame:'orange', weather:['dust',16], floor:'#e8d6d6', floor2:'#d63a3a', floor3:'#ffffff', top:'#7a1f2a', face:'#a8323c', face2:'#6e1520', trim:'#f4f4f4', amb:'rgba(24,4,8,0.50)' },
+  lake:     { tex:'tiles', deco:'crystal', liq:'water', flame:'blue', weather:['snow',60], floor:'#a9c6e0', floor2:'#8eaecb', floor3:'#c3d9ec', top:'#2a4a7a', face:'#1f3a6e', face2:'#162b54', trim:'#dff3ff', amb:'rgba(4,12,36,0.50)' },
+  inferno:  { tex:'speckle', deco:'oven', liq:'cocoa', flame:'orange', weather:['embers',30], floor:'#c98a4b', floor2:'#a86a34', floor3:'#e0a868', top:'#3a1a0a', face:'#5a2a12', face2:'#3a1808', trim:'#ff8a1f', amb:'rgba(30,8,0,0.50)' },
+  barracks: { tex:'planks', deco:'crate', liq:'water', flame:'orange', weather:['none',0], floor:'#5a6a8a', floor2:'#4a5a78', floor3:'#6a7a9a', top:'#1f2a4a', face:'#2a3a6a', face2:'#1a2448', trim:'#d63a3a', amb:'rgba(8,10,28,0.45)' },
+  mirror:   { tex:'tiles', deco:'crystal', liq:'void', flame:'purple', weather:['confetti',20], floor:'#b8a8e0', floor2:'#9a88c8', floor3:'#d0c4f0', top:'#3a2a6a', face:'#5a4a9a', face2:'#3a2a70', trim:'#ffffff', amb:'rgba(14,6,30,0.45)' },
+  prison:   { tex:'tiles', deco:'barrel', liq:'water', flame:'blue', weather:['none',0], floor:'#7a7f88', floor2:'#666b74', floor3:'#8a9098', top:'#2a2d33', face:'#3a3e46', face2:'#24272c', trim:'#9aa3ad', amb:'rgba(4,6,10,0.58)' },
+  catacombs:{ tex:'speckle', deco:'candle', liq:'chasm', flame:'green', weather:['dust',20], floor:'#6a6258', floor2:'#544c44', floor3:'#7a7268', top:'#1e1a16', face:'#2e2822', face2:'#1a1612', trim:'#d9c9a0', amb:'rgba(0,0,0,0.74)' },
+  garden:   { tex:'speckle', deco:'candy', liq:'syrup', flame:'purple', weather:['petals',26], floor:'#7ab86a', floor2:'#5a9a4a', floor3:'#9ad08a', top:'#2a5a2a', face:'#3a7a3a', face2:'#245024', trim:'#ff8fb1', amb:'rgba(10,20,10,0.35)' },
+  chimney:  { tex:'speckle', deco:'barrel', liq:'chasm', flame:'orange', weather:['ash',30], floor:'#4a4448', floor2:'#363034', floor3:'#5a5458', top:'#1a1416', face:'#7a3a2a', face2:'#5a2a1c', trim:'#9a9a9a', amb:'rgba(0,0,0,0.66)' },
+  aurora:   { tex:'tiles', deco:'crystal', liq:'void', flame:'green', weather:['snow',60], floor:'#e8f4fa', floor2:'#c8dcea', floor3:'#ffffff', top:'#1a4a5a', face:'#2a6a7a', face2:'#1a4a5a', trim:'#7fffd4', amb:'rgba(4,20,30,0.40)' },
+  clock:    { tex:'planks', deco:'gear', liq:'chasm', flame:'orange', weather:['none',0], floor:'#b8944a', floor2:'#9a7a38', floor3:'#d0ac5c', top:'#3a2a10', face:'#5a4218', face2:'#3a2a0e', trim:'#ffe14d', amb:'rgba(14,10,0,0.50)' },
+  archives: { tex:'planks', deco:'book', liq:'chasm', flame:'orange', weather:['dust',18], floor:'#6a2a2a', floor2:'#521e1e', floor3:'#7a3636', top:'#2a0e0e', face:'#4a1a1a', face2:'#2e0c0c', trim:'#f2c14e', amb:'rgba(10,0,0,0.56)' },
+  coalcore: { tex:'speckle', deco:'coal', liq:'lava', flame:'orange', weather:['embers',36], floor:'#3a3434', floor2:'#2a2424', floor3:'#4a4040', top:'#120c0c', face:'#2a1a14', face2:'#160c08', trim:'#ff5a1f', amb:'rgba(20,0,0,0.50)' },
+  void:     { tex:'tiles', deco:'crystal', liq:'void', flame:'purple', weather:['snow',50], floor:'#2a3048', floor2:'#1e2438', floor3:'#3a4260', top:'#0a0c18', face:'#141a30', face2:'#0a0e1e', trim:'#8a7aff', amb:'rgba(0,0,10,0.62)' },
+  lastgift: { tex:'tiles', deco:'presents', liq:'syrup', flame:'orange', weather:['snow',40], floor:'#e8d8a8', floor2:'#d0bc84', floor3:'#f6ecc8', top:'#6a1a1a', face:'#8a2020', face2:'#5a1010', trim:'#ffe14d', amb:'rgba(20,8,0,0.35)' },
+});
+const FLAME = { orange:['#ff8a1f','#ff5a1f','#f2c14e','#ffb347','rgba(255,140,40,A)'], blue:['#3b8bff','#3b8bff','#bfe6ff','#7fd3ff','rgba(60,140,255,A)'],
+  green:['#3fdc6a','#1fae4a','#c8ffd0','#7dff9a','rgba(60,255,120,A)'], purple:['#a86aff','#7a3ae0','#e8d0ff','#c08af0','rgba(170,90,255,A)'] };
+
 // Static tiles are painted once per floor into an offscreen layer
 function buildLayer(){
   const f = FLOORS[G.floor], th = THEMES[f.theme], gw = G.grid[0].length, gh = G.grid.length;
@@ -1070,14 +1876,14 @@ function buildLayer(){
       const open = !isWall(gx, gy + 1) && gy + 1 < gh;
       P(sx, sy, 16, 16, th.top);
       // roof texture
-      if (f.theme === 'workshop'){ P(sx, sy + (gx % 2 ? 3 : 9), 16, 1, th.face2); if (h % 3 === 0) P(sx + 4 + h % 7, sy + 5, 3, 1, '#4f8e5c'); }
-      else if (f.theme === 'caverns'){ P(sx + h % 11, sy + (h >> 5) % 11, 3, 2, th.face2); P(sx + (h >> 7) % 13, sy + (h >> 9) % 13, 2, 1, '#7d5032'); }
+      if (th.tex === 'planks'){ P(sx, sy + (gx % 2 ? 3 : 9), 16, 1, th.face2); if (h % 3 === 0) P(sx + 4 + h % 7, sy + 5, 3, 1, '#4f8e5c'); }
+      else if (th.tex === 'speckle'){ P(sx + h % 11, sy + (h >> 5) % 11, 3, 2, th.face2); P(sx + (h >> 7) % 13, sy + (h >> 9) % 13, 2, 1, th.face); }
       else { P(sx + 1, sy + 1, 6, 6, th.face2); P(sx + 9, sy + 9, 6, 6, th.face2); P(sx + 2, sy + 2, 2, 1, th.trim); }
       if (open){ // the wall's front face
         P(sx, sy + 7, 16, 9, th.face);
-        if (f.theme === 'workshop'){ P(sx, sy + 7, 16, 1, th.trim); P(sx, sy + 11, 16, 1, th.face2); P(sx + (gx % 2 ? 3 : 10), sy + 8, 1, 3, th.face2); P(sx + (gx % 2 ? 8 : 4), sy + 12, 1, 4, th.face2);
-          if (h % 4 === 0){ P(sx + 6, sy + 8, 4, 3, '#d63a3a'); P(sx + 7, sy + 8, 2, 3, '#f2c14e'); } }
-        else if (f.theme === 'caverns'){ P(sx, sy + 7, 16, 2, th.trim); for (let i = 0; i < 16; i += 3) P(sx + i, sy + 9, 2, 1 + (hash(gx*16 + i, gy) % 4), th.trim); P(sx, sy + 14, 16, 2, th.face2); }
+        if (th.tex === 'planks'){ P(sx, sy + 7, 16, 1, th.trim); P(sx, sy + 11, 16, 1, th.face2); P(sx + (gx % 2 ? 3 : 10), sy + 8, 1, 3, th.face2); P(sx + (gx % 2 ? 8 : 4), sy + 12, 1, 4, th.face2);
+          if (h % 4 === 0 && f.theme === 'workshop'){ P(sx + 6, sy + 8, 4, 3, '#d63a3a'); P(sx + 7, sy + 8, 2, 3, '#f2c14e'); } }
+        else if (th.tex === 'speckle'){ P(sx, sy + 7, 16, 2, th.trim); for (let i = 0; i < 16; i += 3) P(sx + i, sy + 9, 2, 1 + (hash(gx*16 + i, gy) % 4), th.trim); P(sx, sy + 14, 16, 2, th.face2); }
         else { P(sx, sy + 7, 16, 1, th.trim); P(sx + 2 + h % 9, sy + 9, 1, 5, '#5a7ec0'); P(sx + 1 + (h >> 4) % 12, sy + 10, 2, 1, '#bfe6ff'); P(sx, sy + 15, 16, 1, th.face2); }
       }
       continue;
@@ -1085,10 +1891,10 @@ function buildLayer(){
     if (t === '~' || t === '_' || t === '=') { if (t === '_') P(sx, sy, 16, 16, '#cdeefd'); continue; }
     // floor
     P(sx, sy, 16, 16, th.floor);
-    if (f.theme === 'workshop'){ P(sx, sy + 7, 16, 1, th.floor2); P(sx, sy + 15, 16, 1, th.floor2); P(sx + (gy % 2 ? 4 : 11), sy, 1, 7, th.floor2); P(sx + (gy % 2 ? 9 : 2), sy + 8, 1, 7, th.floor2);
-      P(sx + 1 + h % 12, sy + 2 + (h >> 4) % 4, 2, 1, th.floor3); if (h % 9 === 0) P(sx + 5, sy + 11, 1, 1, '#7a5530'); }
-    else if (f.theme === 'caverns'){ P(sx + (h % 12) + 2, sy + ((h >> 4) % 12) + 2, 2, 2, th.floor2); P(sx + ((h >> 8) % 12) + 1, sy + ((h >> 12) % 12) + 1, 1, 1, th.floor2);
-      P(sx + ((h >> 3) % 13), sy + ((h >> 6) % 13), 2, 1, th.floor3); if (h % 7 === 0){ P(sx + 6, sy + 6, 2, 2, '#ff8fb1'); } }
+    if (th.tex === 'planks'){ P(sx, sy + 7, 16, 1, th.floor2); P(sx, sy + 15, 16, 1, th.floor2); P(sx + (gy % 2 ? 4 : 11), sy, 1, 7, th.floor2); P(sx + (gy % 2 ? 9 : 2), sy + 8, 1, 7, th.floor2);
+      P(sx + 1 + h % 12, sy + 2 + (h >> 4) % 4, 2, 1, th.floor3); if (h % 9 === 0) P(sx + 5, sy + 11, 1, 1, th.face2); }
+    else if (th.tex === 'speckle'){ P(sx + (h % 12) + 2, sy + ((h >> 4) % 12) + 2, 2, 2, th.floor2); P(sx + ((h >> 8) % 12) + 1, sy + ((h >> 12) % 12) + 1, 1, 1, th.floor2);
+      P(sx + ((h >> 3) % 13), sy + ((h >> 6) % 13), 2, 1, th.floor3); if (h % 7 === 0){ P(sx + 6, sy + 6, 2, 2, f.theme === 'caverns' ? '#ff8fb1' : th.trim); } }
     else { P(sx, sy, 16, 1, th.floor2); P(sx, sy, 1, 16, th.floor2); P(sx + 1, sy + 1, 15, 1, th.floor3); if (h % 5 === 0) P(sx + 5, sy + 5, 2, 1, '#c8dcef'); }
     // ambient occlusion next to walls
     if (isWall(gx, gy - 1)){ x.fillStyle = 'rgba(0,0,0,.28)'; x.fillRect(sx, sy, 16, 3); x.fillStyle = 'rgba(0,0,0,.14)'; x.fillRect(sx, sy + 3, 16, 2); }
@@ -1098,11 +1904,12 @@ function buildLayer(){
     const v = h % 3;
     if (t === 'D'){
       x.fillStyle = 'rgba(0,0,0,.25)'; x.fillRect(sx + 2, sy + 13, 12, 3);
-      if (f.theme === 'workshop'){
+      if (drawDeco(P, x, sx, sy, v, th, h)) {}
+      else if (th.deco === 'presents'){
         const cols = [['#d63a3a','#f2c14e','#9e1f2e'],['#3fa34d','#f4f4f4','#2a7036'],['#3b5bd6','#ff8fb1','#273f9e']][v];
         P(sx + 2, sy + 5, 12, 10, '#1a1c2c'); P(sx + 3, sy + 6, 10, 8, cols[0]); P(sx + 3, sy + 12, 10, 2, cols[2]); P(sx + 7, sy + 6, 2, 8, cols[1]); P(sx + 3, sy + 9, 10, 2, cols[1]);
         P(sx + 4, sy + 6, 2, 1, 'rgba(255,255,255,.35)'); P(sx + 5, sy + 2, 2, 4, cols[1]); P(sx + 9, sy + 2, 2, 4, cols[1]); P(sx + 4, sy + 1, 2, 2, cols[1]); P(sx + 10, sy + 1, 2, 2, cols[1]);
-      } else if (f.theme === 'caverns'){
+      } else if (th.deco === 'candy'){
         if (v === 0){ P(sx + 6, sy + 2, 4, 13, '#f4f4f4'); P(sx + 6, sy + 2, 8, 3, '#f4f4f4'); P(sx + 11, sy + 2, 3, 6, '#f4f4f4');
           for (let i = 0; i < 13; i += 3) P(sx + 6, sy + 3 + i, 4, 1, '#d63a3a'); P(sx + 11, sy + 5, 3, 1, '#d63a3a'); P(sx + 9, sy + 3, 1, 12, 'rgba(0,0,0,.15)'); }
         else { const gc = v === 1 ? '#d63a3a' : '#8a4fd1'; P(sx + 3, sy + 7, 10, 8, '#1a1c2c'); P(sx + 4, sy + 6, 8, 8, gc); P(sx + 5, sy + 5, 6, 2, gc); P(sx + 6, sy + 7, 2, 1, '#fff'); P(sx + 4, sy + 12, 8, 2, 'rgba(0,0,0,.25)');
@@ -1119,7 +1926,7 @@ function buildLayer(){
       if (t === 'o'){ P(sx + 3, sy + 6, 10, 3, '#2a1a0c'); } else { P(sx + 7, sy + 8, 2, 3, t === 'K' ? '#ffe14d' : '#f2c14e'); }
     }
     else if (t === 'F'){
-      const blue = f.theme === 'ice';
+      const blue = th.flame !== 'orange';
       P(sx + 1, sy + 1, 14, 15, '#1a1c2c'); P(sx + 2, sy + 2, 12, 13, blue ? '#3a4a66' : '#9a3b2a');
       for (let i = 0; i < 3; i++) P(sx + 2, sy + 4 + i*4, 12, 1, blue ? '#2c3a52' : '#7a2c1e');
       P(sx + 4, sy + 7, 8, 8, '#1a1c2c'); P(sx + 1, sy + 1, 14, 2, blue ? '#5a6a86' : '#c8c8c8'); P(sx + 1, sy + 3, 14, 1, 'rgba(0,0,0,.3)');
@@ -1133,9 +1940,10 @@ function drawDynamicTiles(x0, y0, x1, y1){
   for (let gy = y0; gy <= y1; gy++) for (let gx = x0; gx <= x1; gx++){
     const t = tileAt(gx, gy), sx = gx*TS, sy = gy*TS;
     if (t === '~' || t === '='){
-      px(sx, sy, 16, 16, '#4a2a14');
-      const o = Math.floor(T/8 + gx*3) % 16; px(sx + o, sy + 4, 4, 1, '#7a4520'); px(sx + (o + 8) % 16, sy + 11, 4, 1, '#7a4520');
-      if ((Math.floor(T/20) + gx + gy) % 7 === 0) px(sx + 7, sy + 7, 2, 2, '#a86a34');
+      const lq = LIQ[THEMES[f.theme].liq];
+      px(sx, sy, 16, 16, lq.a);
+      const o = Math.floor(T/8 + gx*3) % 16; px(sx + o, sy + 4, 4, 1, lq.b); px(sx + (o + 8) % 16, sy + 11, 4, 1, lq.b);
+      if ((Math.floor(T/20) + gx + gy) % 7 === 0) px(sx + 7, sy + 7, 2, 2, lq.c);
       if (tileAt(gx, gy - 1) !== '~' && tileAt(gx, gy - 1) !== '=') px(sx, sy, 16, 2, 'rgba(0,0,0,.35)');
       if (t === '='){
         px(sx, sy + 2, 16, 13, 'rgba(0,0,0,.35)');
@@ -1149,9 +1957,9 @@ function drawDynamicTiles(x0, y0, x1, y1){
     }
     else if (t === 'K' && (T >> 4) % 2){ px(sx + 13, sy + 3, 2, 2, '#fff'); px(sx + 1, sy + 4, 1, 1, '#fff'); }
     else if (t === 'F'){
-      const blue = f.theme === 'ice', fl = Math.sin(T/5)*1.5, fl2 = Math.sin(T/3.3 + 1)*1;
-      px(sx + 5, sy + 10 - fl, 6, 5 + fl, blue ? '#3b8bff' : '#ff8a1f'); px(sx + 4, sy + 12 - fl2, 2, 3 + fl2, blue ? '#3b8bff' : '#ff5a1f');
-      px(sx + 10, sy + 12 + fl2, 2, 3 - fl2, blue ? '#3b8bff' : '#ff5a1f'); px(sx + 6, sy + 12 - fl/2, 4, 3, blue ? '#bfe6ff' : '#f2c14e');
+      const fc = FLAME[THEMES[f.theme].flame], fl = Math.sin(T/5)*1.5, fl2 = Math.sin(T/3.3 + 1)*1;
+      px(sx + 5, sy + 10 - fl, 6, 5 + fl, fc[0]); px(sx + 4, sy + 12 - fl2, 2, 3 + fl2, fc[1]);
+      px(sx + 10, sy + 12 + fl2, 2, 3 - fl2, fc[1]); px(sx + 6, sy + 12 - fl/2, 4, 3, fc[2]);
     }
     else if (t === 'L'){
       for (let i = 0; i < 4; i++){ const bx = sx + 1 + i*4; px(bx, sy, 3, 16, '#f4f4f4'); for (let j = (i % 2); j < 16; j += 3) px(bx, sy + j, 3, 1, '#d63a3a'); px(bx + 2, sy, 1, 16, 'rgba(0,0,0,.15)'); }
@@ -1170,8 +1978,8 @@ function shadow(x, y, rx, ry, a=.3){ ctx.fillStyle = `rgba(0,0,0,${a})`; ctx.beg
 function drawEnemy(e){
   const d = MON[e.type], set = monSprites[e.type], img = set.r, w = img.width*e.sc, h = img.height*e.sc;
   let bob = 0;
-  if (d.ai === 'walker' || d.ai === 'general' || d.ai === 'santa') bob = -Math.abs(Math.sin(e.t*8))*1.2*e.sc*.6;
-  else if (d.ai === 'flyer') bob = -4 + Math.sin(e.t*10)*2;
+  if (d.ai === 'walker' || d.ai === 'general' || d.ai === 'santa' || (d.ai === 'pattern' && !d.fly)) bob = -Math.abs(Math.sin(e.t*8))*1.2*e.sc*.6;
+  else if (d.ai === 'flyer' || d.fly) bob = -4 + Math.sin(e.t*10)*2;
   shadow(e.x, e.y - 1, Math.max(4, e.hw*.9) * (1 - Math.min(.5, e.z/90)), 2*e.sc*(1 - Math.min(.5, e.z/90)), d.fly ? .2 : .32);
   let flip = e.dirLR === 'r';
   const telegraph = e.state === 'wind' || e.state === 'windup' || e.state === 'crouch';
@@ -1183,7 +1991,7 @@ function drawEnemy(e){
   const dx = rp(e.x - dw/2), dy = rp(e.y - dh - e.z + bob + 1);
   if (e.boss && e.type === 'santa' && e.hp < e.maxHp/2){ ctx.save(); ctx.globalCompositeOperation = 'lighter'; const g = ctx.createRadialGradient(e.x, e.y - h/2, 2, e.x, e.y - h/2, w*.75);
     g.addColorStop(0, 'rgba(255,30,30,.22)'); g.addColorStop(1, 'rgba(255,40,40,0)'); ctx.fillStyle = g; ctx.fillRect(e.x - w, e.y - h*1.3, w*2, h*1.6); ctx.restore(); }
-  ctx.drawImage(src, dx, dy, dw, dh);
+  ctx.globalAlpha = e.alpha ?? 1; ctx.drawImage(src, dx, dy, dw, dh); ctx.globalAlpha = 1;
   if (e.frozen > 0){ ctx.globalAlpha = .55; ctx.drawImage(flip ? set.il : set.ir, dx, dy, dw, dh); ctx.globalAlpha = 1; }
   if (e.state === 'stun') for (let i = 0; i < 3; i++){ const a = T/8 + i*2.1; px(rp(e.x + Math.cos(a)*10), rp(dy - 2 + Math.sin(a)*3), 2, 2, '#ffe14d'); }
   if (e.weak && !e.boss && (T >> 3) % 3 === 0) px(rp(e.x + rand(-4, 4)), rp(dy + 2), 1, 2, '#9fdcff');
@@ -1225,6 +2033,8 @@ function drawShot(s, hostile){
     case 'crumb': px(x - 3, y - 3, 6, 6, '#1a1c2c'); px(x - 2, y - 2, 4, 4, (Math.floor(s.x + s.y) % 2) ? '#9a6234' : '#d63a3a'); break;
     case 'ice': ctx.save(); ctx.translate(x, y); ctx.rotate(s.t*10); px(-3, -3, 6, 6, '#1f3a6e'); px(-2, -2, 4, 4, '#bfe6ff'); ctx.restore(); break;
     case 'ember': px(x - 2, y - 2, 4, 4, '#ff8a1f'); px(x - 1, y - 1, 2, 2, '#ffe14d'); break;
+    case 'orb': { const r = s.r; px(x - r, y - r + 1, r*2, r*2 - 2, '#1a1c2c'); px(x - r + 1, y - r, r*2 - 2, r*2, '#1a1c2c');
+      px(x - r + 1, y - r + 1, r*2 - 2, r*2 - 2, s.col); px(x - 1, y - 2, 2, 2, '#ffffff'); if (s.home > 0 && (T >> 2) % 2) px(x - r, y - r, 1, 1, '#ffffff'); break; }
     case 'coal': px(x - 3, y - 3, 6, 6, '#111111'); px(x - 2, y - 2, 4, 4, '#33343d'); px(x - 1, y - 1, 2, 2, (T >> 2) % 2 ? '#ff8a1f' : '#ff3b3b'); break;
   }
 }
@@ -1233,6 +2043,7 @@ function drawHazard(h){
   ctx.save(); ctx.globalAlpha = .25 + .35*p; ctx.strokeStyle = '#ff3b3b'; ctx.lineWidth = 1.2;
   ctx.beginPath(); ctx.ellipse(h.x, h.y, h.r, h.r*.6, 0, 0, Math.PI*2); ctx.stroke();
   ctx.fillStyle = 'rgba(255,40,40,.25)'; ctx.beginPath(); ctx.ellipse(h.x, h.y, h.r*p, h.r*.6*p, 0, 0, Math.PI*2); ctx.fill(); ctx.restore();
+  if (h.kind === 'drop'){ const y = rp(h.y - 6 - 80*(1 - p)); px(rp(h.x - 4), y - 4, 8, 8, '#1a1c2c'); px(rp(h.x - 3), y - 3, 6, 6, h.col); px(rp(h.x - 1), y - 2, 2, 2, '#ffffff'); }
   if (h.kind === 'present'){
     const ft = Math.min(1, h.t/(h.delay*.7)); const x = h.fx + (h.x - h.fx)*ft, y = h.fy + (h.y - 4 - h.fy)*ft - Math.sin(ft*Math.PI)*40;
     const bx = rp(x - 4), by = rp(y - 4), blink = ft >= 1 && (T >> 2) % 2;
@@ -1312,7 +2123,7 @@ function renderWorld(){
   for (let gy = y0; gy <= y1; gy++) for (let gx = x0 - 3; gx <= x1 + 3; gx++){
     const t = tileAt(gx, gy);
     if (t === 'F') addLight(gx*TS + 8, gy*TS + 10, 66 + Math.sin(T/6 + gx)*4);
-    else if (t === '~' && (gx + gy) % 2 === 0) addLight(gx*TS + 8, gy*TS + 8, 22, .5);
+    else if (t === '~' && (gx + gy) % 2 === 0 && LIQ[th.liq].glow) addLight(gx*TS + 8, gy*TS + 8, 22, .5);
     else if (t === 'S' && G.bossDown[G.floor]) addLight(gx*TS + 8, gy*TS + 8, 34);
     else if (t === 'K') addLight(gx*TS + 8, gy*TS + 8, 18, .7);
   }
@@ -1326,12 +2137,12 @@ function renderWorld(){
   ctx.save(); ctx.globalCompositeOperation = 'lighter';
   const S2 = (x, y) => [(x - cx)*SC, (y - cy)*SC];
   for (let gy = y0; gy <= y1; gy++) for (let gx = x0; gx <= x1; gx++){
-    const t = tileAt(gx, gy); if (t !== 'F' && !(t === '~' && (gx*3 + gy) % 4 === 0)) continue;
+    const t = tileAt(gx, gy); if (t !== 'F' && !(t === '~' && (gx*3 + gy) % 4 === 0 && LIQ[th.liq].glow)) continue;
     const [sx, sy] = S2(gx*TS + 8, gy*TS + 11);
-    if (t === 'F') addGlow(sx, sy, 40*SC, f.theme === 'ice' ? 'rgba(60,140,255,A)' : 'rgba(255,140,40,A)', .22 + Math.sin(T/5)*.03);
-    else addGlow(sx, sy, 14*SC, 'rgba(255,120,40,A)', .07);
+    if (t === 'F') addGlow(sx, sy, 40*SC, FLAME[th.flame][4], .22 + Math.sin(T/5)*.03);
+    else addGlow(sx, sy, 14*SC, LIQ[th.liq].glow, .07);
   }
-  for (const s of [...G.shots, ...G.eshots]){ const [sx, sy] = S2(s.x, s.y); const col = s.kind === 'ember' || s.kind === 'coal' ? 'rgba(255,120,40,A)' : s.kind === 'holly' ? 'rgba(90,220,110,A)' : s.kind === 'cookie' || s.kind === 'walnut' || s.kind === 'crumb' ? 'rgba(255,190,120,A)' : 'rgba(150,210,255,A)'; addGlow(sx, sy, 10*SC, col, .35); }
+  for (const s of [...G.shots, ...G.eshots]){ const [sx, sy] = S2(s.x, s.y); const col = s.kind === 'orb' ? glowOf(s.col) : s.kind === 'ember' || s.kind === 'coal' ? 'rgba(255,120,40,A)' : s.kind === 'holly' ? 'rgba(90,220,110,A)' : s.kind === 'cookie' || s.kind === 'walnut' || s.kind === 'crumb' ? 'rgba(255,190,120,A)' : 'rgba(150,210,255,A)'; addGlow(sx, sy, 10*SC, col, .35); }
   for (const p of G.parts) if (p.glow){ const [sx, sy] = S2(p.x, p.y); addGlow(sx, sy, 5*SC, 'rgba(255,220,150,A)', .25*(1 - p.t/p.life)); }
   for (const e of G.enemies) if (e.alive && e.type === 'santa'){
     const s = e.sc, img = monSprites.santa.r, ox = e.x - img.width*s/2, oy = e.y - img.height*s - e.z + 1;
@@ -1344,8 +2155,7 @@ function renderWorld(){
     ctx.globalAlpha = p > .7 ? (1 - p)/.3 : 1; ctx.font = `${t.big ? 18 : 13}px "Press Start 2P", monospace`;
     ctx.lineWidth = 5; ctx.strokeStyle = '#120a14'; ctx.strokeText(t.text, sx, sy); ctx.fillStyle = t.color; ctx.fillText(t.text, sx, sy); }
   ctx.globalAlpha = 1;
-  if (f.theme !== 'caverns') drawSnow(f.theme === 'ice' ? 60 : 30, cx*SC, cy*SC);
-  else { for (let i = 0; i < 18; i++){ const k = flakes[i]; const x = ((k.x*cv.width - cx*SC*.5) % cv.width + cv.width) % cv.width, y = ((1 - ((k.y + T*.0006*k.s) % 1))*cv.height); ctx.globalAlpha = .25 + k.z*.3; px(x, y, 3, 3, '#ffb070'); } ctx.globalAlpha = 1; }
+  drawWeather(th.weather[0], th.weather[1], cx*SC, cy*SC);
 }
 function renderOverlay(){
   ctx.setTransform(1, 0, 0, 1, 0, 0);
